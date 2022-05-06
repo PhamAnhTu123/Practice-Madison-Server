@@ -45,6 +45,14 @@ const User = sequelize.define('users', {
     type: DataTypes.STRING(6),
     allowNull: true,
   },
+  passCode: {
+    type: DataTypes.STRING(6),
+    allowNull: true,
+  },
+  passCodeExpire: {
+    type: DataTypes.DATE(),
+    allowNull: true,
+  },
   status: {
     type: DataTypes.STRING(10),
     allowNull: true,

@@ -97,3 +97,45 @@ module.exports.resendVerify = async (req, res) => {
 
   res.status(200).json({ message: 'Success' });
 }
+
+module.exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ where: { email: email } });
+
+  if (!user) { 
+    return res.status(400).send({ message: 'User does not exist' });
+  }
+
+  const code = generateRandStr(6, 'mix');
+
+  await User.update({ passCode: code, passCodeExpire: moment().add(3, 'minutes') }, { where: { email } });
+
+  const mail = mailer.message('phamanhtu12112000@gmail.com', user.email, 'Your recover code here', `Your verify code here ${code}`);
+  mailer.sendMail(mail);
+
+  res.status(200).json({ message: 'Success' });
+}
+
+module.exports.resetPassword = async (req, res) => {
+  const { email, code, newPassword } = req.body;
+  const user = await User.findOne({ where: { email: email } });
+
+  if (!user) { 
+    return res.status(400).send({ message: 'User does not exist' });
+  }
+
+  if (user.passCode !== code) { 
+    return res.status(400).send({ message: 'Wrong reset password code' });
+  }
+
+  if (moment() > user.passCodeExpire) { 
+    return res.status(400).send({ message: 'Verify password code exprired' });
+  }
+
+  const password = await bcrypt.hash(newPassword);
+
+  await user.update({ password, passCode: null, passCodeExpire: null });
+
+  res.json({ body: { user, token: jwt.issue({ id: user.id, scope: user.role }) } });
+}
