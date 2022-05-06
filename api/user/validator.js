@@ -12,3 +12,7 @@ module.exports.updateUserPayload = Joi.object({
   avatar: Joi.string(),
   birthday: Joi.date()
 });
+
+module.exports.requireAuthen = Joi.object({
+  authorization: Joi.string().required()
+})
