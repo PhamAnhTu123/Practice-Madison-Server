@@ -3,6 +3,8 @@ const express = require('express');
 var bodyParser = require('body-parser')
 const { Sequelize } = require('sequelize');
 
+const userRoutes = require('./api/user/routes');
+
 const app = express();
 
 // parse application/x-www-form-urlencoded
@@ -27,9 +29,11 @@ require('./connection');
 //   }
 // }
 
-app.get('/api/v1/wellcome', (req, res) => {
-  res.status(200).json({body: 'Hi there'})
-})
+// app.get('/api/v1/wellcome', (req, res) => {
+//   res.status(200).json({body: 'Hi there'})
+// })
+
+app.use(userRoutes);
 
 // testConnect();
 
