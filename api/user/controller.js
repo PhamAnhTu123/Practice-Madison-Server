@@ -1,3 +1,4 @@
+const moment = require('moment');
 const User = require("../../models/Users");
 const BcryptUtils = require('../../services/Bcrypt');
 const { generateRandStr } = require("../../services/GenerateRandom");
@@ -18,17 +19,19 @@ module.exports.register = async (req, res) => {
   const { username, email, password } = req.body;
   const checkExist = await User.findOne({ where: { email: email } });
   if (checkExist) {
-    console.log(checkExist);
-    res.status(400).send({ messase: 'Email Exist' });
+    return res.status(400).send({ messase: 'Email Exist' });
   }
   const hashedPass = await bcrypt.hash(password);
 
+  const user = await User.create({ username, email, password: hashedPass });
 
+  const code = generateRandStr(6, 'mix');
 
-  const mail = mailer.message('phamanhtu12112000@gmail.com', user.email, 'Wellcome home babe', 'Hello World');
+  await User.update({ verify: code, verifyExpire: moment().add(3, 'minutes') }, { where: { email } });
+
+  const mail = mailer.message('phamanhtu12112000@gmail.com', user.email, 'Wellcome home babe', `Your verify code here ${code}`);
   mailer.sendMail(mail);
 
-  const user = await User.create({ username, email, password: hashedPass });
   res.status(200).json({ body: user });
 }
 
