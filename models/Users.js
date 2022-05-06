@@ -3,7 +3,7 @@ const sequelize = require('../connection');
 
 const User = sequelize.define('users', {
   id: {
-    type: DataTypes.INTEGER.UNSIGNED(6),
+    type: DataTypes.INTEGER(6).UNSIGNED,
     primaryKey: true,
     autoIncrement: true,
     allowNull: false,
@@ -29,7 +29,7 @@ const User = sequelize.define('users', {
     allowNull: false,
   },
   password: {
-    type: DataTypes.STRING(50),
+    type: DataTypes.STRING(100),
     allowNull: false,
   },
   phone: {
