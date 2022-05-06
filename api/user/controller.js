@@ -161,3 +161,16 @@ module.exports.changePassword = async (req, res) => {
 
   res.status(200).json({ body: user, message: 'Change success' });
 }
+
+module.exports.updateMe = async (req, res) => {
+  const tokenDecoded = tokenExtract(req);
+
+  let user = await User.findByPk(tokenDecoded.id);
+  if (!user) { 
+    return res.status(400).send({ message: 'User does not exist' });
+  }
+
+  user.update(req.body);
+
+  res.json({ body: { user } });
+}
