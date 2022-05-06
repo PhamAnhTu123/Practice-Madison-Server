@@ -36,6 +36,11 @@ const User = sequelize.define('users', {
     type: DataTypes.STRING(11),
     allowNull: true,
   },
+  role: {
+    type: DataTypes.STRING(5),
+    allowNull: true,
+    defaultValue: 'user'
+  },
   birthday: {
     type: DataTypes.DATE(),
     allowNull: true,
