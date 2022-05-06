@@ -11,8 +11,10 @@ const Product = sequelize.define('products', {
   },
   categoryID: {
     type: DataTypes.INTEGER(6).UNSIGNED,
-    references: 'categories',
-    referencesKey: 'id'
+    references: {
+      model: Category,
+      key: 'categoryID'
+    }
   },
   name: {
     type: DataTypes.STRING(50),
@@ -31,7 +33,7 @@ const Product = sequelize.define('products', {
   }
 });
 
-Product.belongsTo(Category, { as: 'categories', foreignKey: 'categoryID' });
+// Product.belongsTo(Category, { as: 'categories' })
 
 module.exports = Product
 

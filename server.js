@@ -3,6 +3,7 @@ const express = require('express');
 var bodyParser = require('body-parser')
 
 const userRoutes = require('./api/user/routes');
+const categoryRoutes = require('./api/category/routes');
 
 const app = express();
 
@@ -16,5 +17,6 @@ app.use(bodyParser.json())
 require('./connection');
 
 app.use(userRoutes);
+app.use(categoryRoutes);
 
 app.listen(process.env.PORT, () => console.log('server running on ', process.env.PORT));

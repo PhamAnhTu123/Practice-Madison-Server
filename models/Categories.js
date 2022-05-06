@@ -21,7 +21,7 @@ const Category = sequelize.define('categories', {
     type: DataTypes.STRING(50),
     allowNull: false,
   },
-  quantity: {
+  productQuantity: {
     type: DataTypes.FLOAT,
   }
 })
