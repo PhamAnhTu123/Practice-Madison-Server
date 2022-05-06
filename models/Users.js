@@ -41,6 +41,10 @@ const User = sequelize.define('users', {
     allowNull: true,
     defaultValue: 'user'
   },
+  verify: {
+    type: DataTypes.STRING(6),
+    allowNull: true,
+  },
   birthday: {
     type: DataTypes.DATE(),
     allowNull: true,
@@ -49,7 +53,11 @@ const User = sequelize.define('users', {
     type: DataTypes.DATE(),
     allowNull: true,
     defaultValue: Sequelize.NOW
-  }
+  },
+  verifyExpire: {
+    type: DataTypes.DATE(),
+    allowNull: true,
+  },
 })
 
 
