@@ -45,6 +45,10 @@ const User = sequelize.define('users', {
     type: DataTypes.STRING(6),
     allowNull: true,
   },
+  status: {
+    type: DataTypes.STRING(10),
+    allowNull: true,
+  },
   birthday: {
     type: DataTypes.DATE(),
     allowNull: true,

@@ -56,3 +56,44 @@ module.exports.login = async (req, res) => {
 
   res.json({ body: { user, token: jwt.issue({ id: user.id, scope: user.role }) } });
 }
+
+module.exports.verify = async (req, res) => {
+  const { code, email } = req.body;
+
+  const user = await User.findOne({ where: { email: email } });
+
+  if (!user) { 
+    return res.status(400).send({ message: 'User does not exist' });
+  }
+
+  if (user.verify !== code) { 
+    return res.status(400).send({ message: 'Wrong verify code' });
+  }
+
+  if (moment() > user.verifyExpire) { 
+    return res.status(400).send({ message: 'Verify code exprired' });
+  }
+
+  await User.update({ verify: null, verifyExpire: null, status: 'active' }, { where: { email } });
+
+  res.status(200).json({ body: { user, token: jwt.issue({ id: user.id, scope: user.role }) } })
+}
+
+module.exports.resendVerify = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ where: { email: email } });
+
+  if (!user) { 
+    return res.status(400).send({ message: 'User does not exist' });
+  }
+
+  const code = generateRandStr(6, 'mix');
+
+  await User.update({ verify: code, verifyExpire: moment().add(3, 'minutes') }, { where: { email } });
+
+  const mail = mailer.message('phamanhtu12112000@gmail.com', user.email, 'Wellcome home babe', `Your verify code here ${code}`);
+  mailer.sendMail(mail);
+
+  res.status(200).json({ message: 'Success' });
+}
