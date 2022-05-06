@@ -4,6 +4,7 @@ const BcryptUtils = require('../../services/Bcrypt');
 const { generateRandStr } = require("../../services/GenerateRandom");
 const Jwt = require('../../services/JWT');
 const Mailer = require('../../services/Mailer');
+const { tokenExtract } = require('../../services/TokenExtract');
 
 const bcrypt = new BcryptUtils;
 const jwt = new Jwt;
@@ -138,4 +139,25 @@ module.exports.resetPassword = async (req, res) => {
   await user.update({ password, passCode: null, passCodeExpire: null });
 
   res.json({ body: { user, token: jwt.issue({ id: user.id, scope: user.role }) } });
+}
+
+module.exports.changePassword = async (req, res) => {
+  const { password, newPassword } = req.body;
+  const tokenDecoded = tokenExtract(req);
+  
+  const user = await User.findByPk(tokenDecoded.id);
+  if (!user) { 
+    return res.status(400).send({ message: 'User does not exist' });
+  }
+
+  const comparePassword = await bcrypt.compare(password, user.password);
+  if (!comparePassword) {
+    return res.status(400).send({ message: 'Wrong password' });
+  }
+
+  const newHashedPassword = await bcrypt.hash(newPassword);
+
+  await user.update({ password: newHashedPassword });
+
+  res.status(200).json({ body: user, message: 'Change success' });
 }

@@ -11,5 +11,6 @@ routes.post('/api/v1/users/resend-verify-code', controller.resendVerify);
 routes.post('/api/v1/users/forgot-password', controller.forgotPassword);
 routes.put('/api/v1/users/verify', controller.verify);
 routes.put('/api/v1/users/reset-password', controller.resetPassword);
+routes.put('/api/v1/users/change-password', controller.changePassword);
 
 module.exports = routes;
