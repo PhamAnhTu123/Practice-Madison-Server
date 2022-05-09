@@ -33,7 +33,5 @@ const Product = sequelize.define('products', {
   }
 });
 
-// Product.belongsTo(Category, { as: 'categories' })
-
 module.exports = Product
 
