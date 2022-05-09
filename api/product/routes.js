@@ -8,5 +8,6 @@ const routes = express.Router();
 
 routes.get('/api/v1/products', controller.getAll);
 routes.get('/api/v1/products/:id', validator.params(idParams) , controller.getOne);
+routes.put('/api/v1/products/:id', validator.params(idParams), controller.updateOne);
 
 module.exports = routes;
