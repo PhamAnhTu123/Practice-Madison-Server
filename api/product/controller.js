@@ -20,6 +20,18 @@ module.exports.getOne = async (req, res) => {
   res.status(200).json({ body: product });
 }
 
+module.exports.createOne = async(req, res) => {
+  const tokenDecoded = tokenExtract(req);
+
+  if (tokenDecoded.scope !== 'admin') {
+    return res.status(401).send({ message: 'You do not have the access permission' });
+  }
+
+  const product = await Product.create(req.body);
+
+  res.status(200).json({ body: product });
+}
+
 module.exports.updateOne = async(req, res) => {
   const  { id } = req.params;
 
