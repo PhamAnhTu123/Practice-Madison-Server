@@ -9,5 +9,7 @@ const routes = express.Router();
 
 routes.post('/api/v1/orders', validator.headers(requireAuthen), validator.body(createOrder), controller.createOrder);
 routes.get('/api/v1/orders', validator.headers(requireAuthen), controller.getAll);
+routes.get('/api/v1/users/me/orders', validator.headers(requireAuthen), controller.getAllUserOrder);
+routes.put('/api/v1/orders/:id', validator.headers(requireAuthen), controller.editOrder);
 
 module.exports = routes;

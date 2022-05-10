@@ -20,6 +20,14 @@ module.exports.getAll = async (req, res) => {
   res.status(200).json({ body: orders });
 };
 
+module.exports.getAllUserOrder = async (req, res) => {
+  const tokenDecoded = tokenExtract(req);
+
+  const orders = await Order.findAll({ where: { userID: tokenDecoded.id }, include: { model: OrderItem, as: 'items' } });
+
+  res.status(200).json({ body: orders });
+};
+
 module.exports.createOrder = async (req, res) => {
   const { items } = req.body;
   const tokenDecoded = tokenExtract(req);
@@ -43,4 +51,41 @@ module.exports.createOrder = async (req, res) => {
   const newOrder = await Order.findByPk(order.id, { include: { model: OrderItem, include: { model: Product, as: 'product' }, as: 'items' } });
 
   res.status(200).json({ body: newOrder });
+};
+
+module.exports.editOrder = async (req, res) => {
+  const { id } = req.params;
+  const { items } = req.body;
+
+  const tokenDecoded = tokenExtract(req);
+  let paycheck = 0;
+
+  const order = await Order.findOne({ where: { id, userID: tokenDecoded.id }, include: { model: OrderItem, as: 'items' } });
+
+  if (!order) {
+    return res(400).send({ message: 'Order does not exit' });
+  }
+
+  const orderItems = order.items;
+
+  for (const item of items) {
+    const product = await Product.findByPk(item.productID);
+    if (orderItems.some((orderItem) => orderItem.productID === item.productID)) {
+      await (await OrderItem.findOne({ where: { orderID: order.id, productID: item.productID } })).update({ quantity: item.quantity });
+    } else {
+      await OrderItem.create({ orderID: order.id, productID: item.productID, quantity: item.quantity });
+    }
+
+    if (item.quantity === 0) {
+      await OrderItem.destroy({ where: { productID: item.productID, orderID: order.id } });
+    }
+
+    paycheck += product.price * item.quantity;
+  }
+
+  await order.update({ paycheck });
+
+  const updatedOrder = await Order.findOne({ where: { id, userID: tokenDecoded.id }, include: { model: OrderItem, as: 'items' } });
+
+  res.status(200).json({ body: updatedOrder });
 };
