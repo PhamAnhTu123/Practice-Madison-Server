@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../connection');
 const Category = require('./Categories');
 
@@ -13,8 +13,8 @@ const Product = sequelize.define('products', {
     type: DataTypes.INTEGER(6).UNSIGNED,
     references: {
       model: Category,
-      key: 'categoryID'
-    }
+      key: 'categoryID',
+    },
   },
   name: {
     type: DataTypes.STRING(50),
@@ -34,8 +34,7 @@ const Product = sequelize.define('products', {
   deletedAt: {
     type: DataTypes.DATE(),
     allowNull: true,
-  }
+  },
 });
 
-module.exports = Product
-
+module.exports = Product;

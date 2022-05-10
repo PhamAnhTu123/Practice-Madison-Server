@@ -1,3 +1,7 @@
+/* eslint-disable max-len */
+/* eslint-disable no-await-in-loop */
+/* eslint-disable consistent-return */
+/* eslint-disable no-restricted-syntax */
 const moment = require('moment');
 
 const OrderItem = require('../../models/OrderItem');

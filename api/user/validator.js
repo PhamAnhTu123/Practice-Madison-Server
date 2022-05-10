@@ -10,13 +10,13 @@ module.exports.updateUserPayload = Joi.object({
   gender: Joi.string().valid('male', 'female'),
   phone: Joi.string().max(11),
   avatar: Joi.string(),
-  birthday: Joi.date()
+  birthday: Joi.date(),
 });
 
 module.exports.requireAuthen = Joi.object({
-  authorization: Joi.string().required()
-})
+  authorization: Joi.string().required(),
+});
 
 module.exports.blockOne = Joi.object({
-  status: Joi.boolean().required()
-})
+  status: Joi.boolean().required(),
+});

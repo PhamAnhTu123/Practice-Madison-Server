@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../connection');
 const Product = require('./Products');
 
@@ -27,10 +27,9 @@ const Category = sequelize.define('categories', {
   deletedAt: {
     type: DataTypes.DATE(),
     allowNull: true,
-  }
-})
+  },
+});
 
 Category.hasMany(Product, { as: 'products', foreignKey: 'categoryID' });
 
-module.exports = Category
-
+module.exports = Category;

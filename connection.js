@@ -4,8 +4,8 @@ const sequelize = new Sequelize('trainning', 'root', '123456', {
   host: 'localhost',
   dialect: 'mysql',
   define: {
-    timestamps: false
-  }
+    timestamps: false,
+  },
 });
 
 module.exports = sequelize;

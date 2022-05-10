@@ -1,6 +1,7 @@
 const express = require('express');
 const { idParams } = require('../product/validator');
-const validator = require('express-joi-validation').createValidator({})
+// eslint-disable-next-line import/order
+const validator = require('express-joi-validation').createValidator({});
 
 const controller = require('./controller');
 const { createCategory, updateCategory } = require('./validator');

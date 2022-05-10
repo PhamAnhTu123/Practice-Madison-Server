@@ -39,7 +39,7 @@ const User = sequelize.define('users', {
   role: {
     type: DataTypes.STRING(5),
     allowNull: true,
-    defaultValue: 'user'
+    defaultValue: 'user',
   },
   verify: {
     type: DataTypes.STRING(6),
@@ -64,7 +64,7 @@ const User = sequelize.define('users', {
   reg_date: {
     type: DataTypes.DATE(),
     allowNull: true,
-    defaultValue: Sequelize.NOW
+    defaultValue: Sequelize.NOW,
   },
   verifyExpire: {
     type: DataTypes.DATE(),
@@ -74,8 +74,6 @@ const User = sequelize.define('users', {
     type: DataTypes.DATE(),
     allowNull: true,
   },
-})
+});
 
-
-module.exports = User
-
+module.exports = User;

@@ -1,24 +1,25 @@
+/* eslint-disable consistent-return */
 const moment = require('moment');
-const User = require("../../models/Users");
+const User = require('../../models/Users');
 const BcryptUtils = require('../../services/Bcrypt');
-const { generateRandStr } = require("../../services/GenerateRandom");
+const { generateRandStr } = require('../../services/GenerateRandom');
 const Jwt = require('../../services/JWT');
 const Mailer = require('../../services/Mailer');
 const { tokenExtract } = require('../../services/TokenExtract');
 
-const bcrypt = new BcryptUtils;
-const jwt = new Jwt;
-const mailer = new Mailer;
+const bcrypt = new BcryptUtils();
+const jwt = new Jwt();
+const mailer = new Mailer();
 
 module.exports.wellcome = (req, res) => {
   const random = generateRandStr(6, 'mix');
 
   res.json({ body: random });
-} 
+};
 
 module.exports.register = async (req, res) => {
   const { username, email, password } = req.body;
-  const checkExist = await User.findOne({ where: { email: email } });
+  const checkExist = await User.findOne({ where: { email } });
   if (checkExist) {
     return res.status(400).send({ messase: 'Email Exist' });
   }
@@ -34,14 +35,14 @@ module.exports.register = async (req, res) => {
   mailer.sendMail(mail);
 
   res.status(200).json({ body: user });
-}
+};
 
 module.exports.login = async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ where: { email: email } });
+  const user = await User.findOne({ where: { email } });
 
-  if (!user) { 
+  if (!user) {
     return res.status(400).send({ message: 'User does not exist' });
   }
 
@@ -53,43 +54,43 @@ module.exports.login = async (req, res) => {
     return res.status(400).send({ message: 'User blocked, please contact to admin for more informations' });
   }
 
-  const comparePass = await bcrypt.compare( password , user.getDataValue('password'));
+  const comparePass = await bcrypt.compare(password, user.getDataValue('password'));
 
   if (!comparePass) {
     return res.status(400).send({ message: 'Wrong password' });
   }
 
   res.json({ body: { user, token: jwt.issue({ id: user.id, scope: user.role }) } });
-}
+};
 
 module.exports.verify = async (req, res) => {
   const { code, email } = req.body;
 
-  const user = await User.findOne({ where: { email: email } });
+  const user = await User.findOne({ where: { email } });
 
-  if (!user) { 
+  if (!user) {
     return res.status(400).send({ message: 'User does not exist' });
   }
 
-  if (user.verify !== code) { 
+  if (user.verify !== code) {
     return res.status(400).send({ message: 'Wrong verify code' });
   }
 
-  if (moment() > user.verifyExpire) { 
+  if (moment() > user.verifyExpire) {
     return res.status(400).send({ message: 'Verify code exprired' });
   }
 
   await User.update({ verify: null, verifyExpire: null, status: 'active' }, { where: { email } });
 
-  res.status(200).json({ body: { user, token: jwt.issue({ id: user.id, scope: user.role }) } })
-}
+  res.status(200).json({ body: { user, token: jwt.issue({ id: user.id, scope: user.role }) } });
+};
 
 module.exports.resendVerify = async (req, res) => {
   const { email } = req.body;
 
-  const user = await User.findOne({ where: { email: email } });
+  const user = await User.findOne({ where: { email } });
 
-  if (!user) { 
+  if (!user) {
     return res.status(400).send({ message: 'User does not exist' });
   }
 
@@ -101,14 +102,14 @@ module.exports.resendVerify = async (req, res) => {
   mailer.sendMail(mail);
 
   res.status(200).json({ message: 'Success' });
-}
+};
 
 module.exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
 
-  const user = await User.findOne({ where: { email: email } });
+  const user = await User.findOne({ where: { email } });
 
-  if (!user) { 
+  if (!user) {
     return res.status(400).send({ message: 'User does not exist' });
   }
 
@@ -120,21 +121,21 @@ module.exports.forgotPassword = async (req, res) => {
   mailer.sendMail(mail);
 
   res.status(200).json({ message: 'Success' });
-}
+};
 
 module.exports.resetPassword = async (req, res) => {
   const { email, code, newPassword } = req.body;
-  const user = await User.findOne({ where: { email: email } });
+  const user = await User.findOne({ where: { email } });
 
-  if (!user) { 
+  if (!user) {
     return res.status(400).send({ message: 'User does not exist' });
   }
 
-  if (user.passCode !== code) { 
+  if (user.passCode !== code) {
     return res.status(400).send({ message: 'Wrong reset password code' });
   }
 
-  if (moment() > user.passCodeExpire) { 
+  if (moment() > user.passCodeExpire) {
     return res.status(400).send({ message: 'Verify password code exprired' });
   }
 
@@ -143,14 +144,14 @@ module.exports.resetPassword = async (req, res) => {
   await user.update({ password, passCode: null, passCodeExpire: null });
 
   res.json({ body: { user, token: jwt.issue({ id: user.id, scope: user.role }) } });
-}
+};
 
 module.exports.changePassword = async (req, res) => {
   const { password, newPassword } = req.body;
   const tokenDecoded = tokenExtract(req);
-  
+
   const user = await User.findByPk(tokenDecoded.id);
-  if (!user) { 
+  if (!user) {
     return res.status(400).send({ message: 'User does not exist' });
   }
 
@@ -164,46 +165,44 @@ module.exports.changePassword = async (req, res) => {
   await user.update({ password: newHashedPassword });
 
   res.status(200).json({ body: user, message: 'Change success' });
-}
+};
 
 module.exports.getMe = async (req, res) => {
   const tokenDecoded = tokenExtract(req);
 
-  console.log(tokenDecoded);
-
-  let user = await User.findByPk(tokenDecoded.id);
-  if (!user) { 
+  const user = await User.findByPk(tokenDecoded.id);
+  if (!user) {
     return res.status(400).send({ message: 'User does not exist' });
   }
 
   res.status(200).json({ body: { user } });
-}
+};
 
 module.exports.updateMe = async (req, res) => {
   const tokenDecoded = tokenExtract(req);
 
-  let user = await User.findByPk(tokenDecoded.id);
-  if (!user) { 
+  const user = await User.findByPk(tokenDecoded.id);
+  if (!user) {
     return res.status(400).send({ message: 'User does not exist' });
   }
 
   user.update(req.body);
 
   res.json({ body: { user } });
-}
+};
 
 module.exports.getOne = async (req, res) => {
-  const  { id } = req.params;
+  const { id } = req.params;
   const user = await User.findByPk(id);
   if (!user) {
     return res.status(400).send({ message: 'User does not exists' });
   }
 
   res.status(200).json({ body: user });
-}
+};
 
 module.exports.deletedOne = async (req, res) => {
-  const  { id } = req.params;
+  const { id } = req.params;
 
   const tokenDecoded = tokenExtract(req);
 
@@ -219,10 +218,10 @@ module.exports.deletedOne = async (req, res) => {
   user.update({ deletedAt: moment() });
 
   res.status(200).json({ body: user });
-}
+};
 
 module.exports.blockOne = async (req, res) => {
-  const  { id } = req.params;
+  const { id } = req.params;
 
   const tokenDecoded = tokenExtract(req);
 
@@ -242,4 +241,4 @@ module.exports.blockOne = async (req, res) => {
   }
 
   res.status(200).json({ body: user });
-}
+};
