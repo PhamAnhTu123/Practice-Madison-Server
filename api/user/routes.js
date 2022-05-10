@@ -7,6 +7,7 @@ const { loginPayload, updateUserPayload, requireAuthen } = require('./validator'
 const routes = express.Router();
 
 routes.get('/api/v1/wellcome', controller.wellcome);
+routes.get('/api/v1/users/me', validator.headers(requireAuthen), controller.getMe);
 routes.get('/api/v1/users/:id', controller.getOne);
 routes.post('/api/v1/users/register', controller.register);
 routes.post('/api/v1/users/login', validator.body(loginPayload) , controller.login);
