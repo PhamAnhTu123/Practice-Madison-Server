@@ -1,3 +1,4 @@
+const sequelize = require("../../connection");
 const Category = require("../../models/Categories")
 const Product = require("../../models/Products")
 const { tokenExtract } = require("../../services/TokenExtract");
@@ -6,7 +7,7 @@ module.exports.getAll = async (req, res) => {
   const categories = await Category.findAll({order: [
     ['name', 'ASC'],
     ['productQuantity', 'DESC']
-  ] , include: [ { model: Product, as: 'products' } ] });
+  ] , include: [ { model: Product, as: 'products', where: sequelize.literal('products.deletedAt IS NULL') } ], where: sequelize.literal('categories.deletedAt IS NULL') });
   res.status(200).json({ body: categories });
 }
 

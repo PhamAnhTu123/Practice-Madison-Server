@@ -23,6 +23,10 @@ const Category = sequelize.define('categories', {
   },
   productQuantity: {
     type: DataTypes.FLOAT,
+  },
+  deletedAt: {
+    type: DataTypes.DATE(),
+    allowNull: true,
   }
 })
 

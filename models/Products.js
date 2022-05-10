@@ -30,6 +30,10 @@ const Product = sequelize.define('products', {
   },
   price: {
     type: DataTypes.FLOAT,
+  },
+  deletedAt: {
+    type: DataTypes.DATE(),
+    allowNull: true,
   }
 });
 
