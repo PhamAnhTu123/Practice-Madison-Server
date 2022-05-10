@@ -1,16 +1,21 @@
-const sequelize = require("../../connection");
+/* eslint-disable consistent-return */
 const moment = require('moment');
-const Category = require("../../models/Categories")
-const Product = require("../../models/Products")
-const { tokenExtract } = require("../../services/TokenExtract");
+const sequelize = require('../../connection');
+const Category = require('../../models/Categories');
+const Product = require('../../models/Products');
+const { tokenExtract } = require('../../services/TokenExtract');
 
 module.exports.getAll = async (req, res) => {
-  const categories = await Category.findAll({order: [
-    ['name', 'ASC'],
-    ['productQuantity', 'DESC']
-  ] , include: [ { model: Product, as: 'products', where: sequelize.literal('products.deletedAt IS NULL') } ], where: sequelize.literal('categories.deletedAt IS NULL') });
+  const categories = await Category.findAll({
+    order: [
+      ['name', 'ASC'],
+      ['productQuantity', 'DESC'],
+    ],
+    include: [{ model: Product, as: 'products', where: sequelize.literal('products.deletedAt IS NULL') }],
+    where: sequelize.literal('categories.deletedAt IS NULL'),
+  });
   res.status(200).json({ body: categories });
-}
+};
 
 module.exports.getOne = async (req, res) => {
   const category = await Category.findByPk(req.params.id, { include: { model: Product, as: 'products' } });
@@ -19,9 +24,9 @@ module.exports.getOne = async (req, res) => {
   }
 
   res.status(200).json({ body: category });
-}
+};
 
-module.exports.createOne = async(req, res) => {
+module.exports.createOne = async (req, res) => {
   const tokenDecoded = tokenExtract(req);
 
   if (tokenDecoded.scope !== 'admin') {
@@ -31,10 +36,10 @@ module.exports.createOne = async(req, res) => {
   const category = await Category.create(req.body);
 
   res.status(200).json({ body: category });
-}
+};
 
-module.exports.updateOne = async(req, res) => {
-  const  { id } = req.params;
+module.exports.updateOne = async (req, res) => {
+  const { id } = req.params;
 
   const tokenDecoded = tokenExtract(req);
 
@@ -50,10 +55,10 @@ module.exports.updateOne = async(req, res) => {
   category.update(req.body);
 
   res.status(200).json({ body: category });
-}
+};
 
 module.exports.deletedOne = async (req, res) => {
-  const  { id } = req.params;
+  const { id } = req.params;
 
   const tokenDecoded = tokenExtract(req);
 
@@ -69,4 +74,4 @@ module.exports.deletedOne = async (req, res) => {
   category.update({ deletedAt: moment() });
 
   res.status(200).json({ body: category });
-}
+};

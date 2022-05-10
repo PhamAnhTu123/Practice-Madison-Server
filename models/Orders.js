@@ -1,8 +1,7 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../connection');
 
 const User = require('./Users');
-const OrderItem = require('./OrderItem');
 
 const Order = sequelize.define('orders', {
   id: {
@@ -13,20 +12,22 @@ const Order = sequelize.define('orders', {
   },
   status: {
     type: DataTypes.STRING(50),
-    allowNull: false,
+    allowNull: true,
   },
   userID: {
     type: DataTypes.INTEGER(6).UNSIGNED,
     references: {
       model: User,
-      key: 'userID'
-    }
+      key: 'userID',
+    },
   },
   paycheck: {
     type: DataTypes.FLOAT,
   },
-})
+  createdAt: {
+    type: DataTypes.DATE(),
+    allowNull: true,
+  },
+});
 
-Order.hasMany(OrderItem, { as: 'items', foreignKey: 'orderID' });
-
-module.exports = Order
+module.exports = Order;

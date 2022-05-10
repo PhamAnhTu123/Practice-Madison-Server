@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../connection');
 
 const Order = require('./Orders');
@@ -15,22 +15,19 @@ const OrderItem = sequelize.define('order_items', {
     type: DataTypes.INTEGER(6).UNSIGNED,
     references: {
       model: Order,
-      key: 'orderID'
-    }
+      key: 'orderID',
+    },
   },
   productID: {
     type: DataTypes.INTEGER(6).UNSIGNED,
     references: {
       model: Product,
-      key: 'productID'
-    }
+      key: 'productID',
+    },
   },
   quantity: {
     type: DataTypes.INTEGER,
   },
-})
+});
 
-OrderItem.belongsTo(Order);
-
-module.exports = OrderItem
-
+module.exports = OrderItem;
