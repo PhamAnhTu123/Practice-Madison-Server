@@ -2,7 +2,7 @@ const express = require('express');
 const validator = require('express-joi-validation').createValidator({})
 
 const controller = require('./controller');
-const { loginPayload, updateUserPayload, requireAuthen } = require('./validator');
+const { loginPayload, updateUserPayload, requireAuthen, blockOne } = require('./validator');
 
 const routes = express.Router();
 
@@ -17,5 +17,7 @@ routes.put('/api/v1/users/verify', controller.verify);
 routes.put('/api/v1/users/reset-password', controller.resetPassword);
 routes.put('/api/v1/users/change-password', validator.headers(requireAuthen), controller.changePassword);
 routes.put('/api/v1/users/me',validator.headers(requireAuthen), validator.body(updateUserPayload), controller.updateMe);
+routes.put('/api/v1/users/:id/status', validator.headers(requireAuthen), validator.body(blockOne), controller.blockOne);
+routes.delete('/api/v1/users/:id', validator.headers(requireAuthen), controller.deletedOne);
 
 module.exports = routes;

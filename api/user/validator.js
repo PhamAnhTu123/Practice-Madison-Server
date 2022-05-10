@@ -16,3 +16,7 @@ module.exports.updateUserPayload = Joi.object({
 module.exports.requireAuthen = Joi.object({
   authorization: Joi.string().required()
 })
+
+module.exports.blockOne = Joi.object({
+  status: Joi.boolean().required()
+})

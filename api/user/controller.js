@@ -197,3 +197,45 @@ module.exports.getOne = async (req, res) => {
 
   res.status(200).json({ body: user });
 }
+
+module.exports.deletedOne = async (req, res) => {
+  const  { id } = req.params;
+
+  const tokenDecoded = tokenExtract(req);
+
+  if (tokenDecoded.scope !== 'admin') {
+    return res.status(401).send({ message: 'You do not have the access permission' });
+  }
+
+  const user = await User.findByPk(id);
+  if (!user) {
+    return res.status(400).send({ message: 'User does not exist' });
+  }
+
+  user.update({ deletedAt: moment() });
+
+  res.status(200).json({ body: user });
+}
+
+module.exports.blockOne = async (req, res) => {
+  const  { id } = req.params;
+
+  const tokenDecoded = tokenExtract(req);
+
+  if (tokenDecoded.scope !== 'admin') {
+    return res.status(401).send({ message: 'You do not have the access permission' });
+  }
+
+  const user = await User.findByPk(id);
+  if (!user) {
+    return res.status(400).send({ message: 'User does not exist' });
+  }
+
+  if (req.body.status) {
+    user.update({ status: 'blocked' });
+  } else {
+    user.update({ status: 'active' });
+  }
+
+  res.status(200).json({ body: user });
+}
