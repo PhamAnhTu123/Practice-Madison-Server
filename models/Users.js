@@ -70,6 +70,10 @@ const User = sequelize.define('users', {
     type: DataTypes.DATE(),
     allowNull: true,
   },
+  deletedAt: {
+    type: DataTypes.DATE(),
+    allowNull: true,
+  },
 })
 
 

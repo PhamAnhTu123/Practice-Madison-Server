@@ -174,3 +174,13 @@ module.exports.updateMe = async (req, res) => {
 
   res.json({ body: { user } });
 }
+
+module.exports.getOne = async (req, res) => {
+  const  { id } = req.params;
+  const user = await User.findByPk(id);
+  if (!user) {
+    return res.status(400).send({ message: 'User does not exists' });
+  }
+
+  res.status(200).json({ body: user });
+}
