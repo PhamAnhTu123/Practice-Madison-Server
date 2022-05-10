@@ -49,6 +49,10 @@ module.exports.login = async (req, res) => {
     return res.status(400).send({ message: 'User need to verify email first' });
   }
 
+  if (user.status === 'blocked') {
+    return res.status(400).send({ message: 'User blocked, please contact to admin for more informations' });
+  }
+
   const comparePass = await bcrypt.compare( password , user.getDataValue('password'));
 
   if (!comparePass) {
