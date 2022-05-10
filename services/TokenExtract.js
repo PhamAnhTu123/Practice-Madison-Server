@@ -1,6 +1,6 @@
 const Jwt = require('./JWT');
 
-const jwt = new Jwt;
+const jwt = new Jwt();
 
 module.exports.tokenExtract = (req) => {
   const bearer = req.headers.authorization;
@@ -8,4 +8,4 @@ module.exports.tokenExtract = (req) => {
   const tokenDecoded = jwt.verify(bearerToken);
 
   return tokenDecoded;
-}
+};

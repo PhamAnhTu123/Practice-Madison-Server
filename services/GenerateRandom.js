@@ -1,12 +1,11 @@
-module.exports.generateRandStr= function(length, type = 'mix') {
+module.exports.generateRandStr = function (length, type = 'mix') {
   let characters;
   if (type === 'mix') {
     characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   } else if (type === 'numeric') {
     characters = '0123456789';
   } else if (type === 'mixIgnoreCase') {
-    characters =
-      'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789';
+    characters = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789';
   }
   let result = '';
   const charactersLength = characters.length;
@@ -14,4 +13,4 @@ module.exports.generateRandStr= function(length, type = 'mix') {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
-}
+};

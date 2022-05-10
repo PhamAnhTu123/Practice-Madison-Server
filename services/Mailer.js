@@ -11,14 +11,13 @@ class Mailer {
     });
   }
 
-  message = (from, to, subject, html) => {
-    return {
-      from,
-      to,
-      subject,
-      html,
-    };
-  };
+  // eslint-disable-next-line class-methods-use-this
+  message = (from, to, subject, html) => ({
+    from,
+    to,
+    subject,
+    html,
+  });
 
   sendMail(mail) {
     this.transporter.sendMail(mail, (err, info) => {

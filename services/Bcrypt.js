@@ -13,13 +13,15 @@ class BcryptUtils {
     return Bcrypt.hashSync(password, this.saltRounds);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   compare(password, hash) {
     return Bcrypt.compare(password, hash);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   compareSync(password, hash) {
     return Bcrypt.compareSync(password, hash);
   }
 }
 
-module.exports =  BcryptUtils;
+module.exports = BcryptUtils;
