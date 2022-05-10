@@ -9,6 +9,17 @@ const Order = require('../../models/Orders');
 const Product = require('../../models/Products');
 const { tokenExtract } = require('../../services/TokenExtract');
 
+module.exports.getAll = async (req, res) => {
+  const tokenDecoded = tokenExtract(req);
+  if (tokenDecoded.scope !== 'admin') {
+    return res.status(403).send({ message: 'You do not have permission to access' });
+  }
+
+  const orders = await Order.findAll({ include: { model: OrderItem, as: 'items' } });
+
+  res.status(200).json({ body: orders });
+};
+
 module.exports.createOrder = async (req, res) => {
   const { items } = req.body;
   const tokenDecoded = tokenExtract(req);
