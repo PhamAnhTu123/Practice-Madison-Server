@@ -24,7 +24,7 @@ routes.post('/api/v1/users/forgot-password', controller.forgotPassword);
 routes.put('/api/v1/users/verify', controller.verify);
 routes.put('/api/v1/users/reset-password', controller.resetPassword);
 routes.put('/api/v1/users/change-password', validator.headers(requireAuthen), controller.changePassword);
-routes.put('/api/v1/users/me', validator.headers(requireAuthen), validator.body(updateUserPayload), controller.updateMe);
+routes.put('/api/v1/users/me', upload.single('file'), validator.headers(requireAuthen), validator.body(updateUserPayload), controller.updateMe);
 routes.put('/api/v1/users/:id/status', validator.headers(requireAuthen), validator.body(blockOne), controller.blockOne);
 routes.delete('/api/v1/users/:id', validator.headers(requireAuthen), controller.deletedOne);
 

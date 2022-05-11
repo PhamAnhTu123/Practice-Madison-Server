@@ -224,6 +224,11 @@ module.exports.updateMe = async (req, res) => {
     return res.status(400).send({ message: 'User does not exist' });
   }
 
+  if (req.file) {
+    const response = await cloudinary.uploader.upload(`public/${req.file.originalname}`, { folder: 'upload', upload_preset: 'ml_default' });
+    req.body.avatar = response.url;
+  }
+
   user.update(req.body);
 
   res.json({ body: { user } });
