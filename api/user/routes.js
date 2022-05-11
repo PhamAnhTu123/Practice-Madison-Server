@@ -13,6 +13,8 @@ routes.get('/api/v1/users/me', validator.headers(requireAuthen), controller.getM
 routes.get('/api/v1/users/:id', controller.getOne);
 routes.post('/api/v1/users/register', controller.register);
 routes.post('/api/v1/users/login', validator.body(loginPayload), controller.login);
+routes.post('/api/v1/admins/login', controller.adminLogin);
+routes.post('/api/v1/admins/logout', controller.logout);
 routes.post('/api/v1/users/resend-verify-code', controller.resendVerify);
 routes.post('/api/v1/users/forgot-password', controller.forgotPassword);
 routes.put('/api/v1/users/verify', controller.verify);

@@ -63,6 +63,35 @@ module.exports.login = async (req, res) => {
   res.json({ body: { user, token: jwt.issue({ id: user.id, scope: user.role }) } });
 };
 
+module.exports.adminLogin = async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ where: { email } });
+
+  if (!user) {
+    return res.status(400).send({ message: 'Admin does not exist' });
+  }
+
+  const comparePass = await bcrypt.compare(password, user.getDataValue('password'));
+
+  if (!comparePass) {
+    return res.status(400).send({ message: 'Wrong password' });
+  }
+
+  req.session.isAuth = true;
+
+  res.status(200).json({ body: user });
+};
+
+module.exports.logout = (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      throw err;
+    }
+  });
+  res.status(200).json({ message: 'Deleted session' });
+};
+
 module.exports.verify = async (req, res) => {
   const { code, email } = req.body;
 
