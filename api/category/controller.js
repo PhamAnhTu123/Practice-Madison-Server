@@ -3,7 +3,6 @@ const moment = require('moment');
 const sequelize = require('../../connection');
 const Category = require('../../models/Categories');
 const Product = require('../../models/Products');
-const { tokenExtract } = require('../../services/TokenExtract');
 const { cloudinary } = require('../../services/Cloudinary');
 
 module.exports.getAll = async (req, res) => {
@@ -28,12 +27,6 @@ module.exports.getOne = async (req, res) => {
 };
 
 module.exports.createOne = async (req, res) => {
-  const tokenDecoded = tokenExtract(req);
-
-  if (tokenDecoded.scope !== 'admin') {
-    return res.status(401).send({ message: 'You do not have the access permission' });
-  }
-
   const response = await cloudinary.uploader.upload(`public/${req.file.originalname}`, { folder: 'upload', upload_preset: 'ml_default' });
   req.body.thumbnail = response.url;
 
@@ -44,12 +37,6 @@ module.exports.createOne = async (req, res) => {
 
 module.exports.updateOne = async (req, res) => {
   const { id } = req.params;
-
-  const tokenDecoded = tokenExtract(req);
-
-  if (tokenDecoded.scope !== 'admin') {
-    return res.status(401).send({ message: 'You do not have the access permission' });
-  }
 
   if (req.file) {
     const response = await cloudinary.uploader.upload(`public/${req.file.originalname}`, { folder: 'upload', upload_preset: 'ml_default' });
@@ -68,12 +55,6 @@ module.exports.updateOne = async (req, res) => {
 
 module.exports.deletedOne = async (req, res) => {
   const { id } = req.params;
-
-  const tokenDecoded = tokenExtract(req);
-
-  if (tokenDecoded.scope !== 'admin') {
-    return res.status(401).send({ message: 'You do not have the access permission' });
-  }
 
   const category = await Category.findByPk(id);
   if (!category) {
