@@ -3,6 +3,8 @@ node_modules/
 **-error.log
 **.lock
 
+public/
+
 # Logs
 logs
 *.log

@@ -4,6 +4,7 @@ const sequelize = require('../../connection');
 const Category = require('../../models/Categories');
 const Product = require('../../models/Products');
 const { tokenExtract } = require('../../services/TokenExtract');
+const { cloudinary } = require('../../services/Cloudinary');
 
 module.exports.getAll = async (req, res) => {
   const categories = await Category.findAll({
@@ -33,6 +34,9 @@ module.exports.createOne = async (req, res) => {
     return res.status(401).send({ message: 'You do not have the access permission' });
   }
 
+  const response = await cloudinary.uploader.upload(`public/${req.file.originalname}`, { folder: 'upload', upload_preset: 'ml_default' });
+  req.body.thumbnail = response.url;
+
   const category = await Category.create(req.body);
 
   res.status(200).json({ body: category });
@@ -45,6 +49,11 @@ module.exports.updateOne = async (req, res) => {
 
   if (tokenDecoded.scope !== 'admin') {
     return res.status(401).send({ message: 'You do not have the access permission' });
+  }
+
+  if (req.file) {
+    const response = await cloudinary.uploader.upload(`public/${req.file.originalname}`, { folder: 'upload', upload_preset: 'ml_default' });
+    req.body.thumbnail = response.url;
   }
 
   const category = await Category.findByPk(id);
