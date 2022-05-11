@@ -17,3 +17,7 @@ module.exports.updateOrder = Joi.object({
 module.exports.requireAuthen = Joi.object({
   authorization: Joi.string().required(),
 });
+
+module.exports.payloadSubmit = Joi.object({
+  type: Joi.valid('visa', 'cash').required(),
+});

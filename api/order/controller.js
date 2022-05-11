@@ -3,11 +3,15 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-restricted-syntax */
 const moment = require('moment');
+const Mailer = require('../../services/Mailer');
+
+const mailer = new Mailer();
 
 const OrderItem = require('../../models/OrderItem');
 const Order = require('../../models/Orders');
 const Product = require('../../models/Products');
 const { tokenExtract } = require('../../services/TokenExtract');
+const User = require('../../models/Users');
 
 module.exports.getAll = async (req, res) => {
   const tokenDecoded = tokenExtract(req);
@@ -51,6 +55,33 @@ module.exports.createOrder = async (req, res) => {
   const newOrder = await Order.findByPk(order.id, { include: { model: OrderItem, include: { model: Product, as: 'product' }, as: 'items' } });
 
   res.status(200).json({ body: newOrder });
+};
+
+module.exports.submitOrder = async (req, res) => {
+  const { type } = req.body;
+  const { id } = req.params;
+
+  const tokenDecoded = tokenExtract(req);
+
+  const order = await Order.findOne({ where: { id, userID: tokenDecoded.id }, include: { model: OrderItem, as: 'items' } });
+
+  if (!order) {
+    return res(400).send({ message: 'Order does not exit' });
+  }
+
+  const user = await User.findByPk(tokenDecoded.id);
+
+  if (type === 'cash') {
+    await order.update({ status: 'pending payment' });
+    const mail = mailer.message('phamanhtu12112000@gmail.com', user.email, 'Wellcome home babe', 'Your order has been delivering');
+    mailer.sendMail(mail);
+  } else {
+    await order.update({ status: 'payment success' });
+    const mail = mailer.message('phamanhtu12112000@gmail.com', user.email, 'Wellcome home babe', 'Your order has been delivering');
+    mailer.sendMail(mail);
+  }
+
+  res.status(200).json({ body: order });
 };
 
 module.exports.editOrder = async (req, res) => {
