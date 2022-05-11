@@ -5,6 +5,7 @@ const BcryptUtils = require('../../services/Bcrypt');
 const { generateRandStr } = require('../../services/GenerateRandom');
 const Jwt = require('../../services/JWT');
 const Mailer = require('../../services/Mailer');
+const { cloudinary } = require('../../services/Cloudinary');
 const { tokenExtract } = require('../../services/TokenExtract');
 
 const bcrypt = new BcryptUtils();
@@ -12,9 +13,17 @@ const jwt = new Jwt();
 const mailer = new Mailer();
 
 module.exports.wellcome = (req, res) => {
-  const random = generateRandStr(6, 'mix');
+  res.render('test.ejs');
+};
 
-  res.json({ body: random });
+module.exports.testMultiplepart = async (req, res) => {
+  try {
+    const response = await cloudinary.uploader.upload(`public/${req.file.originalname}`, { folder: 'upload', upload_preset: 'ml_default' });
+    console.log(response);
+  } catch (error) {
+    console.log(error);
+  }
+  res.render('test.ejs');
 };
 
 module.exports.register = async (req, res) => {

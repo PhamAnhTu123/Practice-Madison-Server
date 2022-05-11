@@ -1,14 +1,18 @@
 const express = require('express');
+
 const validator = require('express-joi-validation').createValidator({});
 
 const controller = require('./controller');
+const upload = require('../../services/Multer');
+
 const {
   loginPayload, updateUserPayload, requireAuthen, blockOne,
 } = require('./validator');
 
 const routes = express.Router();
 
-routes.get('/api/v1/wellcome', controller.wellcome);
+routes.get('/wellcome', controller.wellcome);
+routes.post('/api/v1/test', upload.single('file'), controller.testMultiplepart);
 routes.get('/api/v1/users/me', validator.headers(requireAuthen), controller.getMe);
 routes.get('/api/v1/users/:id', controller.getOne);
 routes.post('/api/v1/users/register', controller.register);
