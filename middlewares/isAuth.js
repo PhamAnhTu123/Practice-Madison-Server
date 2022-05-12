@@ -2,6 +2,6 @@ module.exports.isAuth = (req, res, next) => {
   if (req.session.isAuth) {
     next();
   } else {
-    res.redirect('/wellcome');
+    res.redirect('/admin/login');
   }
 };

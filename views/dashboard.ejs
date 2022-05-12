@@ -60,7 +60,7 @@
             <table class="table table-hover table-striped">
                 <thead>
                     <tr>
-                        <th scope="col">Order</th>
+                        <th scope="col">Avatar</th>
                         <th scope="col">User name</th>
                         <th scope="col">Full name</th>
                         <th scope="col">Email</th>
@@ -71,12 +71,12 @@
                 <tbody>
                     <% for(user of users) { %>
                         <tr>
-                          <td><%= user.id %></td>
+                          <td><img style="height:50px ; width: 50px;" src="<%= user.avatar %>" /></td>
                           <td><%= user.username %></td>
                           <td><%= user.fullname %></td>
                           <td><%= user.email %></td>
                           <td><%= user.status %></td>
-                          <td><button class="btn-primary">update</button> | <Button class="btn-danger">delete</Button></td>
+                          <td><button class="btn-primary mb-2"><a style="color: inherit;" href="/users/<%= user.id %>">Detail</a></button> | <form action="/api/v1/users/<%= user.id %>/delete" method="post"><Button type="submit" class="btn-danger">delete</Button></form></td>
                         </tr>
                      <% } %>
                 </tbody>

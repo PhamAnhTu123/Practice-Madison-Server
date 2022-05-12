@@ -1,6 +1,8 @@
+/* eslint-disable no-console */
 /* eslint-disable consistent-return */
 const moment = require('moment');
 const User = require('../../models/Users');
+const sequelize = require('../../connection');
 const BcryptUtils = require('../../services/Bcrypt');
 const { generateRandStr } = require('../../services/GenerateRandom');
 const Jwt = require('../../services/JWT');
@@ -21,7 +23,7 @@ module.exports.loginTemplate = (req, res) => {
 };
 
 module.exports.dashboard = async (req, res) => {
-  const users = await User.findAll();
+  const users = await User.findAll({ where: sequelize.literal('users.deletedAt IS NULL') });
   res.render('dashboard.ejs', { users });
 };
 
@@ -98,7 +100,7 @@ module.exports.adminLogin = async (req, res) => {
 
   req.session.isAuth = true;
 
-  res.render('dashboard.ejs');
+  res.redirect('/dashboard');
 };
 
 module.exports.logout = (req, res) => {
@@ -250,7 +252,7 @@ module.exports.getOne = async (req, res) => {
     return res.status(400).send({ message: 'User does not exists' });
   }
 
-  res.status(200).json({ body: user });
+  res.render('user.ejs', { user });
 };
 
 module.exports.deletedOne = async (req, res) => {
@@ -263,7 +265,7 @@ module.exports.deletedOne = async (req, res) => {
 
   user.update({ deletedAt: moment() });
 
-  res.status(200).json({ body: user });
+  res.redirect('/dashboard');
 };
 
 module.exports.blockOne = async (req, res) => {
@@ -280,5 +282,5 @@ module.exports.blockOne = async (req, res) => {
     user.update({ status: 'active' });
   }
 
-  res.status(200).json({ body: user });
+  res.render('user.ejs', { user });
 };

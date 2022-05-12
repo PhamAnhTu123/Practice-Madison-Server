@@ -17,7 +17,7 @@ routes.get('/dashboard', isAuth, controller.dashboard);
 routes.get('/admin/login', controller.loginTemplate);
 routes.post('/api/v1/test', upload.single('file'), controller.testMultiplepart);
 routes.get('/api/v1/users/me', validator.headers(requireAuthen), controller.getMe);
-routes.get('/api/v1/users/:id', controller.getOne);
+routes.get('/users/:id', controller.getOne);
 routes.post('/api/v1/users/register', controller.register);
 routes.post('/api/v1/users/login', validator.body(loginPayload), controller.login);
 routes.post('/api/v1/admins/login', controller.adminLogin);
@@ -28,7 +28,7 @@ routes.put('/api/v1/users/verify', controller.verify);
 routes.put('/api/v1/users/reset-password', controller.resetPassword);
 routes.put('/api/v1/users/change-password', validator.headers(requireAuthen), controller.changePassword);
 routes.put('/api/v1/users/me', upload.single('file'), validator.headers(requireAuthen), validator.body(updateUserPayload), controller.updateMe);
-routes.put('/api/v1/users/:id/status', isAuth, validator.body(blockOne), controller.blockOne);
-routes.delete('/api/v1/users/:id', isAuth, controller.deletedOne);
+routes.post('/api/v1/users/:id/status', isAuth, validator.body(blockOne), controller.blockOne);
+routes.post('/api/v1/users/:id/delete', isAuth, controller.deletedOne);
 
 module.exports = routes;
