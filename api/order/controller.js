@@ -14,14 +14,9 @@ const { tokenExtract } = require('../../services/TokenExtract');
 const User = require('../../models/Users');
 
 module.exports.getAll = async (req, res) => {
-  const tokenDecoded = tokenExtract(req);
-  if (tokenDecoded.scope !== 'admin') {
-    return res.status(403).send({ message: 'You do not have permission to access' });
-  }
+  const orders = await Order.findAll({ include: [{ model: User, as: 'user' }, { model: OrderItem, as: 'items' }] });
 
-  const orders = await Order.findAll({ include: { model: OrderItem, as: 'items' } });
-
-  res.status(200).json({ body: orders });
+  res.render('order.ejs', { orders });
 };
 
 module.exports.getAllUserOrder = async (req, res) => {
@@ -82,6 +77,29 @@ module.exports.submitOrder = async (req, res) => {
   }
 
   res.status(200).json({ body: order });
+};
+
+module.exports.getOne = async (req, res) => {
+  const { id } = req.params;
+
+  const order = await Order.findByPk(id, { include: [{ model: User, as: 'user' }, { model: OrderItem, include: { model: Product, as: 'product' }, as: 'items' }] });
+
+  res.render('orderDetail.ejs', { order });
+};
+
+module.exports.updatePaymentMethod = async (req, res) => {
+  const { paymentMethod } = req.body;
+  const { id } = req.params;
+
+  const order = await Order.findByPk(id);
+
+  if (paymentMethod === 'visa') {
+    order.update({ paymentDate: order.createdAt, status: 'payment success', paymentMethod });
+  } else {
+    order.update({ paymentDate: moment(), status: 'payment success', paymentMethod });
+  }
+
+  res.redirect(`/orders/${id}`);
 };
 
 module.exports.editOrder = async (req, res) => {

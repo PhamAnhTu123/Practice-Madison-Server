@@ -14,6 +14,10 @@ const Order = sequelize.define('orders', {
     type: DataTypes.STRING(50),
     allowNull: true,
   },
+  paymentMethod: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
+  },
   userID: {
     type: DataTypes.INTEGER(6).UNSIGNED,
     references: {
@@ -25,6 +29,10 @@ const Order = sequelize.define('orders', {
     type: DataTypes.FLOAT,
   },
   createdAt: {
+    type: DataTypes.DATE(),
+    allowNull: true,
+  },
+  paymentDate: {
     type: DataTypes.DATE(),
     allowNull: true,
   },

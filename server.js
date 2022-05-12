@@ -16,6 +16,7 @@ const Category = require('./models/Categories');
 const OrderItem = require('./models/OrderItem');
 const Order = require('./models/Orders');
 const sequelize = require('./connection');
+const User = require('./models/Users');
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.use(
 
 Product.belongsTo(Category);
 Order.hasMany(OrderItem, { as: 'items', foreignKey: 'orderID' });
+Order.belongsTo(User);
 OrderItem.belongsTo(Order);
 OrderItem.belongsTo(Product);
 

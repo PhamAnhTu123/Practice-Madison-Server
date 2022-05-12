@@ -56,32 +56,31 @@
             </div>
         </nav>
         <div class="container">
-            <h1>Danh sách sản phẩm</h1>
-            <div>
-                <form action="/products/creates">
-                    <button class="btn btn-primary">create new</button>
-                </form>
-            </div>
+            <h1>Danh sách đơn hàng</h1>
             <table class="table table-hover table-striped">
                 <thead>
                     <tr>
-                        <th scope="col">Thumbnail</th>
-                        <th scope="col">name</th>
-                        <th scope="col">Category</th>
-                        <th scope="col">description</th>
-                        <th scope="col">Unit price</th>
+                        <th scope="col">User name</th>
+                        <th scope="col">User fullname</th>
+                        <th scope="col">Items Quantity</th>
+                        <th scope="col">Order date</th>
+                        <th scope="col">Payment method</th>
+                        <th scope="col">Paycheck</th>
+                        <th scope="col">Status</th>
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <% for(product of products) { %>
+                    <% for(order of orders) { %>
                         <tr>
-                          <td><img style="height:50px ; width: 50px;" src="<%= product.thumbnail %>" /></td>
-                          <td><%= product.name %></td>
-                          <td><%= product.category.name %></td>
-                          <td><%= product.description %></td>
-                          <td><%= product.price %> $</td>
-                          <td><button class="btn-primary mb-2"><a style="color: inherit;" href="/products/<%= product.id %>">Detail</a></button> | <form action="/api/v1/products/<%= product.id %>/delete" method="post"><Button type="submit" class="btn-danger">delete</Button></form></td>
+                          <td><%= order.user.username %></td>
+                          <td><%= order.user.fullname %></td>
+                          <td><%= order.items.length %></td>
+                          <td><%= order.createdAt %></td>
+                          <td><%= order.paymentMethod %></td>
+                          <td><%= order.paycheck %> $</td>
+                          <td><%= order.status %></td>
+                          <td><button class="btn-primary"><a style="color: inherit;" href="/orders/<%= order.id %>">Detail</a></button></td>
                         </tr>
                      <% } %>
                 </tbody>
