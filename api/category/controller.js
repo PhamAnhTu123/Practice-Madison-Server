@@ -11,10 +11,29 @@ module.exports.getAll = async (req, res) => {
       ['name', 'ASC'],
       ['productQuantity', 'DESC'],
     ],
-    include: [{ model: Product, as: 'products', where: sequelize.literal('products.deletedAt IS NULL') }],
     where: sequelize.literal('categories.deletedAt IS NULL'),
   });
   res.status(200).json({ body: categories });
+};
+
+module.exports.getAllForAdmin = async (req, res) => {
+  const categories = await Category.findAll({
+    order: [
+      ['name', 'ASC'],
+      ['productQuantity', 'DESC'],
+    ],
+    where: sequelize.literal('categories.deletedAt IS NULL'),
+  });
+  res.render('category.ejs', { categories });
+};
+
+module.exports.getOneCategoryForAdmin = async (req, res) => {
+  const category = await Category.findByPk(req.params.id, { include: { model: Product, as: 'products' } });
+  if (!category) {
+    return res.status(400).send({ message: 'Category does not exist' });
+  }
+
+  res.render('categoryDetail.ejs', { category });
 };
 
 module.exports.getOne = async (req, res) => {
@@ -30,9 +49,11 @@ module.exports.createOne = async (req, res) => {
   const response = await cloudinary.uploader.upload(`public/${req.file.originalname}`, { folder: 'upload', upload_preset: 'ml_default' });
   req.body.thumbnail = response.url;
 
+  req.body.productQuantity = 0;
+
   const category = await Category.create(req.body);
 
-  res.status(200).json({ body: category });
+  res.redirect(`/categories/${category.id}`);
 };
 
 module.exports.updateOne = async (req, res) => {
@@ -50,7 +71,7 @@ module.exports.updateOne = async (req, res) => {
 
   category.update(req.body);
 
-  res.status(200).json({ body: category });
+  res.render('categoryDetail.ejs', { category });
 };
 
 module.exports.deletedOne = async (req, res) => {
@@ -63,5 +84,5 @@ module.exports.deletedOne = async (req, res) => {
 
   category.update({ deletedAt: moment() });
 
-  res.status(200).json({ body: category });
+  res.redirect('/categories');
 };
