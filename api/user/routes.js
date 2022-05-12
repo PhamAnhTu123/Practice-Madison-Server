@@ -13,6 +13,8 @@ const { isAuth } = require('../../middlewares/isAuth');
 const routes = express.Router();
 
 routes.get('/wellcome', controller.wellcome);
+routes.get('/dashboard', isAuth, controller.dashboard);
+routes.get('/admin/login', controller.loginTemplate);
 routes.post('/api/v1/test', upload.single('file'), controller.testMultiplepart);
 routes.get('/api/v1/users/me', validator.headers(requireAuthen), controller.getMe);
 routes.get('/api/v1/users/:id', controller.getOne);

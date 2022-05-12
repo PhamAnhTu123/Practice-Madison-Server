@@ -16,6 +16,15 @@ module.exports.wellcome = (req, res) => {
   res.render('test.ejs');
 };
 
+module.exports.loginTemplate = (req, res) => {
+  res.render('login.ejs');
+};
+
+module.exports.dashboard = async (req, res) => {
+  const users = await User.findAll();
+  res.render('dashboard.ejs', { users });
+};
+
 module.exports.testMultiplepart = async (req, res) => {
   try {
     const response = await cloudinary.uploader.upload(`public/${req.file.originalname}`, { folder: 'upload', upload_preset: 'ml_default' });
@@ -89,7 +98,7 @@ module.exports.adminLogin = async (req, res) => {
 
   req.session.isAuth = true;
 
-  res.status(200).json({ body: user });
+  res.render('dashboard.ejs');
 };
 
 module.exports.logout = (req, res) => {
