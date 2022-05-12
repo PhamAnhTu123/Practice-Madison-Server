@@ -18,6 +18,33 @@ module.exports.getAll = async (req, res) => {
   res.status(200).json({ body: categories });
 };
 
+module.exports.getAllForAdmin = async (req, res) => {
+  const products = await Product.findAll({
+    order: [
+      ['name', 'ASC'],
+      ['price', 'DESC'],
+    ],
+    include: { model: Category, as: 'category' },
+    where: sequelize.literal('products.deletedAt IS NULL'),
+  });
+
+  res.render('product.ejs', { products });
+};
+
+module.exports.createProduct = async (req, res) => {
+  const categories = await Category.findAll();
+  res.render('productCreate.ejs', { categories });
+};
+
+module.exports.getOneForAdmin = async (req, res) => {
+  const product = await Product.findByPk(req.params.id, { include: { model: Category, as: 'category' } });
+  if (!product) {
+    return res.status(400).send({ message: 'Product does not exist' });
+  }
+
+  res.render('productDetail.ejs', { product });
+};
+
 module.exports.getOne = async (req, res) => {
   const product = await Product.findByPk(req.params.id, { include: { model: Category, as: 'category' } });
   if (!product) {
@@ -33,7 +60,7 @@ module.exports.createOne = async (req, res) => {
 
   const product = await Product.create(req.body);
 
-  res.status(200).json({ body: product });
+  res.redirect(`/products/${product.id}`);
 };
 
 module.exports.updateOne = async (req, res) => {
@@ -51,7 +78,7 @@ module.exports.updateOne = async (req, res) => {
 
   product.update(req.body);
 
-  res.status(200).json({ body: product });
+  res.redirect(`/products/${id}`);
 };
 
 module.exports.deletedOne = async (req, res) => {
@@ -64,5 +91,5 @@ module.exports.deletedOne = async (req, res) => {
 
   product.update({ deletedAt: moment() });
 
-  res.status(200).json({ body: product });
+  res.redirect('/products');
 };
