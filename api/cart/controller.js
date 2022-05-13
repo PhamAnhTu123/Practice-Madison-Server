@@ -43,6 +43,10 @@ module.exports.updateCart = async (req, res) => {
 
   const cart = await Cart.findOne({ userID: tokenDecoded.id, productID });
 
+  if (!cart) {
+    return res.status(400).send({ message: 'Cart item does not exist' });
+  }
+
   if (quantity === 0) {
     await cart.destroy();
   }

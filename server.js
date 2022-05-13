@@ -10,6 +10,7 @@ const userRoutes = require('./api/user/routes');
 const categoryRoutes = require('./api/category/routes');
 const productRoutes = require('./api/product/routes');
 const orderRoutes = require('./api/order/routes');
+const cartRoutes = require('./api/cart/routes');
 
 const Product = require('./models/Products');
 const Category = require('./models/Categories');
@@ -59,5 +60,6 @@ app.use(userRoutes);
 app.use(categoryRoutes);
 app.use(productRoutes);
 app.use(orderRoutes);
+app.use(cartRoutes);
 
 app.listen(process.env.PORT, () => console.log('server running on ', process.env.PORT));
