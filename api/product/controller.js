@@ -80,6 +80,10 @@ module.exports.createOne = async (req, res) => {
 
   const product = await Product.create(req.body);
 
+  const products = await Product.findAll({ where: { categoryID: req.body.categoryID } });
+  const category = await Category.findByPk(req.body.categoryID);
+  await category.update({ productQuantity: products.length });
+
   res.redirect(`/products/${product.id}`);
 };
 

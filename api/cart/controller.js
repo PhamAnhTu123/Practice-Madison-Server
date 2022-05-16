@@ -27,6 +27,12 @@ module.exports.addToCart = async (req, res) => {
     return res.status(400).send({ message: 'User does not exist' });
   }
 
+  const product = await Product.findByPk(productID);
+
+  if (quantity > product.storage) {
+    return res.status(400).send({ message: 'Out of storage limit' });
+  }
+
   const cartItem = await Cart.findOne({ where: { userID: tokenDecoded.id, productID } });
 
   if (cartItem) {
@@ -46,6 +52,12 @@ module.exports.updateCart = async (req, res) => {
   const user = await User.findByPk(tokenDecoded.id);
   if (!user) {
     return res.status(400).send({ message: 'User does not exist' });
+  }
+
+  const product = await Product.findByPk(productID);
+
+  if (quantity > product.storage) {
+    return res.status(400).send({ message: 'Out of storage limit' });
   }
 
   const cart = await Cart.findOne({ where: { userID: tokenDecoded.id, productID } });

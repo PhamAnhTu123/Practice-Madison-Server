@@ -24,6 +24,10 @@ const Product = sequelize.define('products', {
     type: DataTypes.STRING(100),
     allowNull: false,
   },
+  storage: {
+    type: DataTypes.INTEGER(),
+    allowNull: true,
+  },
   description: {
     type: DataTypes.STRING(50),
     allowNull: false,

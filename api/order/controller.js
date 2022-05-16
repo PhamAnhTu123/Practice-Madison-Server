@@ -49,8 +49,6 @@ module.exports.createOrder = async (req, res) => {
     await order.update({ paymentDate: moment(), status: 'payment success' });
   }
 
-  await Cart.destroy({ where: { userID: tokenDecoded.id } });
-
   let paycheck = 0;
 
   for (const item of items) {
@@ -59,10 +57,17 @@ module.exports.createOrder = async (req, res) => {
       return res.status(400).send({ message: 'Product doesnt exist' });
     }
 
+    if (item.quantity > product.storage) {
+      await order.destroy();
+      return res.status(400).send({ message: 'Out of storage limit' });
+    }
+
     paycheck += product.price * item.quantity;
 
     await OrderItem.create({ orderID: order.id, productID: item.productID, quantity: item.quantity });
+    await product.update({ storage: product.storage - item.quantity });
   }
+  await Cart.destroy({ where: { userID: tokenDecoded.id } });
   await order.update({ paycheck });
 
   const newOrder = await Order.findByPk(order.id, { include: { model: OrderItem, include: { model: Product, as: 'product' }, as: 'items' } });
