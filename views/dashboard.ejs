@@ -76,7 +76,7 @@
                           <td><%= user.fullname %></td>
                           <td><%= user.email %></td>
                           <td><%= user.status %></td>
-                          <td><button class="btn-primary mb-2"><a style="color: inherit;" href="/users/<%= user.id %>">Detail</a></button> | <form action="/api/v1/users/<%= user.id %>/delete" method="post"><Button type="submit" class="btn-danger">delete</Button></form></td>
+                          <td><button class="btn-primary mb-2"><a style="color: inherit;" href="/users/<%= user.id %>">Detail</a></button> | <form action="/api/v1/users/<%= user.id %>/delete" method="post"><Button type="submit" class="btn-danger">Delete</Button></form></td>
                         </tr>
                      <% } %>
                 </tbody>

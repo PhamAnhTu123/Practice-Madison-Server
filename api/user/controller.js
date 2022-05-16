@@ -25,7 +25,7 @@ module.exports.loginTemplate = (req, res) => {
 };
 
 module.exports.dashboard = async (req, res) => {
-  const users = await User.findAll({ where: sequelize.literal('users.deletedAt IS NULL') });
+  const users = await User.findAll({ where: sequelize.literal('users.deletedAt IS NULL AND users.role NOT LIKE "admin"') });
   res.render('dashboard.ejs', { users });
 };
 
