@@ -8,6 +8,7 @@ module.exports.loginPayload = Joi.object({
 module.exports.updateUserPayload = Joi.object({
   fullname: Joi.string().max(50),
   gender: Joi.string().valid('male', 'female'),
+  address: Joi.string(),
   phone: Joi.string().max(11),
   birthday: Joi.date(),
 });

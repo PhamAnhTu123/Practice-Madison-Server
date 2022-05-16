@@ -22,8 +22,17 @@ module.exports.getAll = async (req, res) => {
 
 module.exports.getAllUserOrder = async (req, res) => {
   const tokenDecoded = tokenExtract(req);
+  const { order } = req.query;
 
-  const orders = await Order.findAll({ where: { userID: tokenDecoded.id }, include: { model: OrderItem, as: 'items' } });
+  let orders = await Order.findAll({ where: { userID: tokenDecoded.id }, include: { model: OrderItem, include: { model: Product, as: 'product' }, as: 'items' } });
+
+  if (order === 'price') {
+    orders = await Order.findAll({ where: { userID: tokenDecoded.id }, order: [['paycheck', 'DESC']], include: { model: OrderItem, include: { model: Product, as: 'product' }, as: 'items' } });
+  }
+
+  if (order === 'date') {
+    orders = await Order.findAll({ where: { userID: tokenDecoded.id }, order: [['createdAt', 'DESC']], include: { model: OrderItem, include: { model: Product, as: 'product' }, as: 'items' } });
+  }
 
   res.status(200).json({ body: orders });
 };
