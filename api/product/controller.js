@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 /* eslint-disable consistent-return */
 const moment = require('moment');
 const sequelize = require('../../connection');
@@ -6,16 +7,35 @@ const Product = require('../../models/Products');
 const { cloudinary } = require('../../services/Cloudinary');
 
 module.exports.getAll = async (req, res) => {
-  const categories = await Product.findAll({
-    order: [
-      ['name', 'ASC'],
-      ['price', 'DESC'],
-    ],
+  let products;
+  products = await Product.findAll({
     include: { model: Category, as: 'category' },
     where: sequelize.literal('products.deletedAt IS NULL'),
   });
-
-  res.status(200).json({ body: categories });
+  if (req.query.order) {
+    if (req.query.order === 'name') {
+      products = await Product.findAll({
+        order: [
+          ['name', 'ASC'],
+        ],
+        include: { model: Category, as: 'category' },
+        where: sequelize.literal('products.deletedAt IS NULL'),
+      });
+    } else {
+      products = await Product.findAll({
+        order: [
+          ['price', 'DESC'],
+        ],
+        include: { model: Category, as: 'category' },
+        where: sequelize.literal('products.deletedAt IS NULL'),
+      });
+    }
+  }
+  if (req.query.category) {
+    const filteredProducts = products.filter((product) => product.categoryID == req.query.category);
+    return res.status(200).json({ body: filteredProducts });
+  }
+  res.status(200).json({ body: products });
 };
 
 module.exports.getAllForAdmin = async (req, res) => {

@@ -12,6 +12,7 @@ const Order = require('../../models/Orders');
 const Product = require('../../models/Products');
 const { tokenExtract } = require('../../services/TokenExtract');
 const User = require('../../models/Users');
+const Cart = require('../../models/Cart');
 
 module.exports.getAll = async (req, res) => {
   const orders = await Order.findAll({ include: [{ model: User, as: 'user' }, { model: OrderItem, as: 'items' }] });
@@ -28,10 +29,18 @@ module.exports.getAllUserOrder = async (req, res) => {
 };
 
 module.exports.createOrder = async (req, res) => {
-  const { items } = req.body;
+  const { items, payment } = req.body;
   const tokenDecoded = tokenExtract(req);
 
-  const order = await Order.create({ userID: tokenDecoded.id, createdAt: moment() });
+  const order = await Order.create({
+    userID: tokenDecoded.id, createdAt: moment(), paymentMethod: payment,
+  });
+
+  if (payment === 'visa') {
+    await order.update({ paymentDate: moment(), status: 'payment success' });
+  }
+
+  await Cart.destroy({ where: { userID: tokenDecoded.id } });
 
   let paycheck = 0;
 

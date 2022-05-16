@@ -5,6 +5,7 @@ module.exports.createOrder = Joi.object({
     productID: Joi.number().required(),
     quantity: Joi.number().required(),
   }).required(),
+  payment: Joi.string().required(),
 });
 
 module.exports.updateOrder = Joi.object({

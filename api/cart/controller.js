@@ -27,6 +27,13 @@ module.exports.addToCart = async (req, res) => {
     return res.status(400).send({ message: 'User does not exist' });
   }
 
+  const cartItem = await Cart.findOne({ where: { userID: tokenDecoded.id, productID } });
+
+  if (cartItem) {
+    await cartItem.update({ quantity: cartItem.quantity + quantity });
+    return res.status(200).json({ body: cartItem });
+  }
+
   const cart = await Cart.create({ productID, quantity, userID: tokenDecoded.id });
 
   res.status(200).json({ body: cart });
@@ -41,7 +48,7 @@ module.exports.updateCart = async (req, res) => {
     return res.status(400).send({ message: 'User does not exist' });
   }
 
-  const cart = await Cart.findOne({ userID: tokenDecoded.id, productID });
+  const cart = await Cart.findOne({ where: { userID: tokenDecoded.id, productID } });
 
   if (!cart) {
     return res.status(400).send({ message: 'Cart item does not exist' });

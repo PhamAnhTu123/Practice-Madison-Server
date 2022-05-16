@@ -268,7 +268,7 @@ module.exports.changePassword = async (req, res) => {
 module.exports.getMe = async (req, res) => {
   const tokenDecoded = tokenExtract(req);
 
-  const user = await User.findByPk(tokenDecoded.id);
+  const user = await User.findByPk(tokenDecoded.id, { include: { model: Cart, as: 'cart' } });
   if (!user) {
     return res.status(400).send({ message: 'User does not exist' });
   }
