@@ -35,6 +35,8 @@ app.use(cors({ origin: '*' }));
 // connect to DB
 require('./connection');
 
+require('./services/NodeCron');
+
 app.use(
   session({
     secret: 'keyboard cat',
