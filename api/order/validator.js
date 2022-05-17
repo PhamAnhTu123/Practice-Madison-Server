@@ -3,7 +3,7 @@ const Joi = require('joi');
 module.exports.createOrder = Joi.object({
   items: Joi.array().items({
     productID: Joi.number().required(),
-    quantity: Joi.number().required(),
+    quantity: Joi.number().min(1).required(),
   }).required(),
   payment: Joi.string().required(),
 });
@@ -11,7 +11,7 @@ module.exports.createOrder = Joi.object({
 module.exports.updateOrder = Joi.object({
   items: Joi.array().items({
     productID: Joi.number(),
-    quantity: Joi.number(),
+    quantity: Joi.number().min(1),
   }),
 });
 
