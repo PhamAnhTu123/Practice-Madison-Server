@@ -158,7 +158,7 @@ module.exports.logout = (req, res) => {
       throw err;
     }
   });
-  res.status(200).json({ message: 'Deleted session' });
+  res.redirect('/admin/login');
 };
 
 module.exports.verify = async (req, res) => {
