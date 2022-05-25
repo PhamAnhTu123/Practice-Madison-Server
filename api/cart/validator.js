@@ -7,5 +7,5 @@ module.exports.addToCart = Joi.object({
 
 module.exports.updateCart = Joi.object({
   productID: Joi.number(),
-  quantity: Joi.number().min(1),
+  quantity: Joi.number().min(0),
 });

@@ -9,7 +9,7 @@ const { isAuth } = require('../../middlewares/isAuth');
 const routes = express.Router();
 
 routes.get('/api/v1/products', controller.getAll);
-routes.get('/products', controller.getAllForAdmin);
+routes.get('/products', isAuth, controller.getAllForAdmin);
 routes.get('/products/creates', isAuth, controller.createProduct);
 routes.get('/products/:id', isAuth, controller.getOneForAdmin);
 routes.get('/api/v1/products/:id', validator.params(idParams), controller.getOne);
