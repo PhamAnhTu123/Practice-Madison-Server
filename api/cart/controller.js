@@ -13,7 +13,10 @@ module.exports.getCart = async (req, res) => {
     return res.status(400).send({ message: 'User does not exist' });
   }
 
-  const cartItems = await Cart.findAll({ where: { userID: tokenDecoded.id }, include: { model: Product, as: 'product' } });
+  const cartItems = await Cart.findAll({
+    where: { userID: tokenDecoded.id },
+    include: { model: Product, as: 'product' },
+  });
 
   res.status(200).json({ body: cartItems });
 };
