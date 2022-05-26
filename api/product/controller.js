@@ -3,6 +3,8 @@
 const moment = require('moment');
 const sequelize = require('../../connection');
 const Category = require('../../models/Categories');
+const ProductCategories = require('../../models/ProductCategories');
+const ProductImages = require('../../models/ProductImages');
 const Product = require('../../models/Products');
 const { cloudinary } = require('../../services/Cloudinary');
 
@@ -75,16 +77,51 @@ module.exports.getOne = async (req, res) => {
 };
 
 module.exports.createOne = async (req, res) => {
-  const response = await cloudinary.uploader.upload(`public/${req.file.originalname}`, { folder: 'upload', upload_preset: 'ml_default' });
-  req.body.thumbnail = response.url;
+  const {
+    name, description, storage, price, categories,
+  } = req.body;
 
-  const product = await Product.create(req.body);
+  const product = await Product.create({
+    name,
+    description,
+    storage,
+    price,
+  });
 
-  const products = await Product.findAll({ where: { categoryID: req.body.categoryID } });
-  const category = await Category.findByPk(req.body.categoryID);
-  await category.update({ productQuantity: products.length });
+  req.files.forEach(async (file, index) => {
+    const response = await cloudinary.uploader.upload(
+      `public/${file.originalname}`,
+      { folder: 'upload', upload_preset: 'ml_default' },
+    );
+    if (index === 0) {
+      await ProductImages.create({
+        productID: product.id,
+        url: response.url,
+        status: 'default',
+      });
+    } else {
+      await ProductImages.create({
+        productID: product.id,
+        url: response.url,
+        status: 'optional',
+      });
+    }
+  });
 
-  res.redirect(`/products/${product.id}`);
+  categories.map(async (item) => {
+    const producCategory = await ProductCategories.create({
+      productID: product.id,
+      categoryID: item,
+    });
+
+    const category = await Category.findOne({ where: { id: item }, include: Product });
+    await category.update({ productQuantity: category.products.length });
+
+    return producCategory;
+  });
+
+  // res.redirect(`/products/${product.id}`);
+  res.send('yes please');
 };
 
 module.exports.updateOne = async (req, res) => {

@@ -6,7 +6,7 @@ module.exports.idParams = Joi.object({
 
 module.exports.createProduct = Joi.object({
   name: Joi.string().required(),
-  categoryID: Joi.number().required(),
+  categories: Joi.array().items(Joi.number()).required(),
   description: Joi.string().required(),
   storage: Joi.number().min(0).required(),
   price: Joi.number().required(),

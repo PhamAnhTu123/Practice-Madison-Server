@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../connection');
-const Category = require('./Categories');
 
 const Product = sequelize.define('products', {
   id: {
@@ -9,20 +8,13 @@ const Product = sequelize.define('products', {
     autoIncrement: true,
     allowNull: false,
   },
-  categoryID: {
-    type: DataTypes.INTEGER(6).UNSIGNED,
-    references: {
-      model: Category,
-      key: 'categoryID',
-    },
-  },
   name: {
     type: DataTypes.STRING(50),
     allowNull: false,
   },
   thumbnail: {
     type: DataTypes.STRING(100),
-    allowNull: false,
+    allowNull: true,
   },
   storage: {
     type: DataTypes.INTEGER(),
