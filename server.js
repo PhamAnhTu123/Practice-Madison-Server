@@ -19,6 +19,9 @@ const Order = require('./models/Orders');
 const sequelize = require('./connection');
 const User = require('./models/Users');
 const Cart = require('./models/Cart');
+const ProductCategories = require('./models/ProductCategories');
+const ProductImages = require('./models/ProductImages');
+const CategoryImages = require('./models/CategoryImages');
 
 const app = express();
 
@@ -35,15 +38,21 @@ app.use(cors({ origin: '*' }));
 // connect to DB
 require('./connection');
 
-Product.belongsTo(Category);
+Product.belongsToMany(Category, { through: ProductCategories });
+Product.hasMany(ProductImages, { as: 'images', foreignKey: 'productID' });
 Order.hasMany(OrderItem, { as: 'items', foreignKey: 'orderID' });
 User.hasMany(Cart, { as: 'cart', foreignKey: 'userID' });
 Cart.belongsTo(User);
 Cart.belongsTo(Product);
-Category.hasMany(Product, { as: 'products', foreignKey: 'categoryID' });
+Category.belongsToMany(Product, { through: ProductCategories });
+Category.hasMany(CategoryImages, { as: 'images', foreignKey: 'categoryID' });
 Order.belongsTo(User);
 OrderItem.belongsTo(Order);
 OrderItem.belongsTo(Product);
+ProductCategories.belongsTo(Product);
+ProductCategories.belongsTo(Category);
+ProductImages.belongsTo(Product);
+CategoryImages.belongsTo(Category);
 
 // require('./services/NodeCron');
 
