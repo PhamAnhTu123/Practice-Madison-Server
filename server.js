@@ -35,6 +35,16 @@ app.use(cors({ origin: '*' }));
 // connect to DB
 require('./connection');
 
+Product.belongsTo(Category);
+Order.hasMany(OrderItem, { as: 'items', foreignKey: 'orderID' });
+User.hasMany(Cart, { as: 'cart', foreignKey: 'userID' });
+Cart.belongsTo(User);
+Cart.belongsTo(Product);
+Category.hasMany(Product, { as: 'products', foreignKey: 'categoryID' });
+Order.belongsTo(User);
+OrderItem.belongsTo(Order);
+OrderItem.belongsTo(Product);
+
 // require('./services/NodeCron');
 
 app.use(
@@ -47,16 +57,6 @@ app.use(
     saveUninitialized: false,
   }),
 );
-
-Product.belongsTo(Category);
-Order.hasMany(OrderItem, { as: 'items', foreignKey: 'orderID' });
-User.hasMany(Cart, { as: 'cart', foreignKey: 'userID' });
-Cart.belongsTo(User);
-Cart.belongsTo(Product);
-Category.hasMany(Product, { as: 'products', foreignKey: 'categoryID' });
-Order.belongsTo(User);
-OrderItem.belongsTo(Order);
-OrderItem.belongsTo(Product);
 
 app.use(userRoutes);
 app.use(categoryRoutes);
