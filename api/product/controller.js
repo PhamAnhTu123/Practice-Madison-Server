@@ -46,7 +46,7 @@ module.exports.getAllForAdmin = async (req, res) => {
       ['name', 'ASC'],
       ['price', 'DESC'],
     ],
-    include: { model: Category, as: 'category' },
+    include: [{ model: Category }, { model: ProductImages, as: 'images' }],
     where: sequelize.literal('products.deletedAt IS NULL'),
   });
 

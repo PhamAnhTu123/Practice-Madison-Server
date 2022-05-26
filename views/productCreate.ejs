@@ -78,19 +78,17 @@
                             <input type="text" value="0" name="storage" class="form-control" id="exampleInputPassword1">
                         </div>
                         <div class="mb-3">
-                            <label for="exampleInputPassword1" class="form-label">Category</label>
-                            <select class="form-select" name="categoryID" aria-label="Default select example">
-                                <option selected>Open this select menu</option>
-                                <% for(category of categories) { %>
-                                    <option value="<%= category.id %>">
-                                        <%= category.name %>
-                                    </option>
-                                    <% } %>
-                            </select>
+                            <label for="exampleInputPassword1" class="form-label">Category: </label>
+                            <% for(category of categories) { %>
+                                <input name="categories" class="form-check-input" type="checkbox" value="<%= category.id %>">
+                                <label class="form-check-label">
+                                    <%= category.name %>
+                                </label>
+                                <% } %>
                         </div>
                         <div class="mb-3">
                             <label for="exampleInputPassword1" class="form-label">Update thumbnail</label>
-                            <input name="file" type="file" class="form-control" id="exampleInputPassword1">
+                            <input name="file" multiple type="file" class="form-control" id="exampleInputPassword1">
                         </div>
                         <button type="submit" class="btn btn-primary">Create new</button>
                     </form>

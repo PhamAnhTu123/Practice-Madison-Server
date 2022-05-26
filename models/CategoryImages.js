@@ -19,6 +19,9 @@ const CategoryImages = sequelize.define('product_images', {
   url: {
     type: DataTypes.STRING(250),
   },
+  status: {
+    type: DataTypes.STRING(100),
+  },
   created_at: {
     type: DataTypes.DATE(),
     allowNull: true,
