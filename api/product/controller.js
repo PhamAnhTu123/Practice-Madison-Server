@@ -59,7 +59,7 @@ module.exports.createProduct = async (req, res) => {
 };
 
 module.exports.getOneForAdmin = async (req, res) => {
-  const product = await Product.findByPk(req.params.id, { include: { model: Category, as: 'category' } });
+  const product = await Product.findByPk(req.params.id, { include: [{ model: Category }, { model: ProductImages, as: 'images' }] });
   if (!product) {
     return res.status(400).send({ message: 'Product does not exist' });
   }
@@ -120,8 +120,16 @@ module.exports.createOne = async (req, res) => {
     return producCategory;
   });
 
-  // res.redirect(`/products/${product.id}`);
-  res.send('yes please');
+  res.redirect(`/products/${product.id}`);
+};
+
+module.exports.updateThumbnail = async (req, res) => {
+  const { image } = req.body;
+  const { id } = req.params;
+  await ProductImages.update({ status: 'optional' }, { where: { productID: id } });
+  await ProductImages.update({ status: 'default' }, { where: { id: image } });
+
+  res.redirect(`/products/${id}`);
 };
 
 module.exports.updateOne = async (req, res) => {
@@ -137,7 +145,7 @@ module.exports.updateOne = async (req, res) => {
     req.body.thumbnail = response.url;
   }
 
-  product.update(req.body);
+  await product.update(req.body);
 
   res.redirect(`/products/${id}`);
 };
