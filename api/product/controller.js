@@ -1,5 +1,6 @@
 /* eslint-disable eqeqeq */
 /* eslint-disable consistent-return */
+const fs = require('fs');
 const sequelize = require('../../connection');
 const Category = require('../../models/Categories');
 const ProductCategories = require('../../models/ProductCategories');
@@ -93,6 +94,7 @@ module.exports.createOne = async (req, res) => {
       `public/${file.originalname}`,
       { folder: 'upload', upload_preset: 'ml_default' },
     );
+    fs.unlinkSync(`public/${file.originalname}`);
     if (index === 0) {
       await ProductImages.create({
         productID: product.id,

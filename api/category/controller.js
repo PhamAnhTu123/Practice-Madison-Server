@@ -1,5 +1,5 @@
 /* eslint-disable consistent-return */
-const moment = require('moment');
+const fs = require('fs');
 const sequelize = require('../../connection');
 const Category = require('../../models/Categories');
 const CategoryImages = require('../../models/CategoryImages');
@@ -36,7 +36,7 @@ module.exports.getAllForAdmin = async (req, res) => {
 module.exports.getOneCategoryForAdmin = async (req, res) => {
   const category = await Category.findByPk(req.params.id, {
     include: [
-      { model: Product, as: 'products', where: { deletedAt: null } },
+      { model: Product, as: 'products' },
       { model: CategoryImages, as: 'images' },
     ],
   });
@@ -66,6 +66,7 @@ module.exports.createOne = async (req, res) => {
       `public/${file.originalname}`,
       { folder: 'upload', upload_preset: 'ml_default' },
     );
+    fs.unlinkSync(`public/${file.originalname}`);
     if (index === 0) {
       await CategoryImages.create({
         categoryID: category.id,
@@ -114,12 +115,17 @@ module.exports.updateThumbnail = async (req, res) => {
 module.exports.deletedOne = async (req, res) => {
   const { id } = req.params;
 
-  const category = await Category.findByPk(id);
+  const category = await Category.findByPk(id, { include: { model: Product } });
   if (!category) {
     return res.status(400).send({ message: 'Category does not exist' });
   }
 
-  category.update({ deletedAt: moment() });
+  if (category.products.length > 0) {
+    return res.status(400).send({ message: 'Can not delete this category' });
+  }
+
+  await CategoryImages.destroy({ where: { categoryID: category.id } });
+  await category.destroy();
 
   res.redirect('/categories');
 };
