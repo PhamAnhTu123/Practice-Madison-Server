@@ -18,7 +18,8 @@ module.exports.getAll = async (req, res) => {
 };
 
 module.exports.getAllForAdmin = async (req, res) => {
-  const categories = await Category.findAll({
+  const limit = 5;
+  const categories = await Category.findAndCountAll({
     order: [
       ['name', 'ASC'],
       ['productQuantity', 'DESC'],
@@ -28,9 +29,12 @@ module.exports.getAllForAdmin = async (req, res) => {
       { model: Product },
     ],
     where: sequelize.literal('categories.deletedAt IS NULL'),
+    offset: limit * (req.query.pages ? req.query.pages - 1 : 0),
+    limit,
+    distinct: true,
   });
 
-  res.render('category.ejs', { categories });
+  res.render('category.ejs', { categories: categories.rows, pages: categories.count });
 };
 
 module.exports.getOneCategoryForAdmin = async (req, res) => {
