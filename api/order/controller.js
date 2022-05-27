@@ -64,7 +64,9 @@ module.exports.createOrder = async (req, res) => {
 
     paycheck += product.price * item.quantity;
 
-    await OrderItem.create({ orderID: order.id, productID: item.productID, quantity: item.quantity });
+    await OrderItem.create({
+      orderID: order.id, productID: item.productID, quantity: item.quantity, price: item.price,
+    });
     await product.update({ storage: product.storage - item.quantity });
   }
   await Cart.destroy({ where: { userID: tokenDecoded.id } });

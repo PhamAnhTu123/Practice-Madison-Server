@@ -28,6 +28,9 @@ const OrderItem = sequelize.define('order_items', {
   quantity: {
     type: DataTypes.INTEGER,
   },
+  price: {
+    type: DataTypes.FLOAT,
+  },
 });
 
 module.exports = OrderItem;

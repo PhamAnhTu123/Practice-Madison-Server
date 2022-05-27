@@ -4,6 +4,7 @@ module.exports.createOrder = Joi.object({
   items: Joi.array().items({
     productID: Joi.number().required(),
     quantity: Joi.number().min(1).required(),
+    price: Joi.number().required(),
   }).required(),
   payment: Joi.string().required(),
 });
