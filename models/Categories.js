@@ -14,7 +14,7 @@ const Category = sequelize.define('categories', {
   },
   thumbnail: {
     type: DataTypes.STRING(100),
-    allowNull: false,
+    allowNull: true,
   },
   description: {
     type: DataTypes.STRING(50),

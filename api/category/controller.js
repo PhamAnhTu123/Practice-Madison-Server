@@ -49,12 +49,29 @@ module.exports.getOne = async (req, res) => {
 };
 
 module.exports.createOne = async (req, res) => {
-  const response = await cloudinary.uploader.upload(`public/${req.file.originalname}`, { folder: 'upload', upload_preset: 'ml_default' });
-  req.body.thumbnail = response.url;
-
   req.body.productQuantity = 0;
 
   const category = await Category.create(req.body);
+
+  req.files.forEach(async (file, index) => {
+    const response = await cloudinary.uploader.upload(
+      `public/${file.originalname}`,
+      { folder: 'upload', upload_preset: 'ml_default' },
+    );
+    if (index === 0) {
+      await CategoryImages.create({
+        categoryID: category.id,
+        url: response.url,
+        status: 'default',
+      });
+    } else {
+      await CategoryImages.create({
+        categoryID: category.id,
+        url: response.url,
+        status: 'optional',
+      });
+    }
+  });
 
   res.redirect(`/categories/${category.id}`);
 };
