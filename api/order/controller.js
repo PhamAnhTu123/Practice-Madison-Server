@@ -13,6 +13,7 @@ const Product = require('../../models/Products');
 const { tokenExtract } = require('../../services/TokenExtract');
 const User = require('../../models/Users');
 const Cart = require('../../models/Cart');
+const ProductImages = require('../../models/ProductImages');
 
 module.exports.getAll = async (req, res) => {
   const orders = await Order.findAll({ include: [{ model: User, as: 'user' }, { model: OrderItem, as: 'items' }] });
@@ -24,14 +25,37 @@ module.exports.getAllUserOrder = async (req, res) => {
   const tokenDecoded = tokenExtract(req);
   const { order } = req.query;
 
-  let orders = await Order.findAll({ where: { userID: tokenDecoded.id }, include: { model: OrderItem, include: { model: Product, as: 'product' }, as: 'items' } });
+  let orders = await Order.findAll({
+    where: { userID: tokenDecoded.id },
+    include: {
+      model: OrderItem,
+      include: { model: Product, include: { model: ProductImages, as: 'images', where: { status: 'default' } }, as: 'product' },
+      as: 'items',
+    },
+  });
 
   if (order === 'price') {
-    orders = await Order.findAll({ where: { userID: tokenDecoded.id }, order: [['paycheck', 'DESC']], include: { model: OrderItem, include: { model: Product, as: 'product' }, as: 'items' } });
+    orders = await Order.findAll({
+      where: { userID: tokenDecoded.id },
+      order: [['paycheck', 'DESC']],
+      include: {
+        model: OrderItem,
+        include: { model: Product, include: { model: ProductImages, as: 'images', where: { status: 'default' } }, as: 'product' },
+        as: 'items',
+      },
+    });
   }
 
   if (order === 'date') {
-    orders = await Order.findAll({ where: { userID: tokenDecoded.id }, order: [['createdAt', 'DESC']], include: { model: OrderItem, include: { model: Product, as: 'product' }, as: 'items' } });
+    orders = await Order.findAll({
+      where: { userID: tokenDecoded.id },
+      order: [['createdAt', 'DESC']],
+      include: {
+        model: OrderItem,
+        include: { model: Product, include: { model: ProductImages, as: 'images', where: { status: 'default' } }, as: 'product' },
+        as: 'items',
+      },
+    });
   }
 
   res.status(200).json({ body: orders });

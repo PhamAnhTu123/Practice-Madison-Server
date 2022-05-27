@@ -12,7 +12,7 @@ const { cloudinary } = require('../../services/Cloudinary');
 module.exports.getAll = async (req, res) => {
   let products;
   products = await Product.findAll({
-    include: { model: Category, as: 'category' },
+    include: [{ model: Category, as: 'categories' }, { model: ProductImages, as: 'images', where: { status: 'default' } }],
     where: sequelize.literal('products.deletedAt IS NULL'),
   });
   if (req.query.order) {
@@ -21,7 +21,7 @@ module.exports.getAll = async (req, res) => {
         order: [
           ['name', 'ASC'],
         ],
-        include: { model: Category, as: 'category' },
+        include: [{ model: Category, as: 'categories' }, { model: ProductImages, as: 'images', where: { status: 'default' } }],
         where: sequelize.literal('products.deletedAt IS NULL'),
       });
     } else {
@@ -29,13 +29,14 @@ module.exports.getAll = async (req, res) => {
         order: [
           ['price', 'DESC'],
         ],
-        include: { model: Category, as: 'category' },
+        include: [{ model: Category, as: 'categories' }, { model: ProductImages, as: 'images', where: { status: 'default' } }],
         where: sequelize.literal('products.deletedAt IS NULL'),
       });
     }
   }
   if (req.query.category) {
-    const filteredProducts = products.filter((product) => product.categoryID == req.query.category);
+    // eslint-disable-next-line max-len
+    const filteredProducts = products.filter((product) => product.categories.some((category) => category.id == req.query.category));
     return res.status(200).json({ body: filteredProducts });
   }
   res.status(200).json({ body: products });

@@ -4,6 +4,7 @@ const User = require('../../models/Users');
 const { tokenExtract } = require('../../services/TokenExtract');
 const Cart = require('../../models/Cart');
 const Product = require('../../models/Products');
+const ProductImages = require('../../models/ProductImages');
 
 module.exports.getCart = async (req, res) => {
   const tokenDecoded = tokenExtract(req);
@@ -15,7 +16,7 @@ module.exports.getCart = async (req, res) => {
 
   const cartItems = await Cart.findAll({
     where: { userID: tokenDecoded.id },
-    include: { model: Product, as: 'product' },
+    include: { model: Product, include: { model: ProductImages, as: 'images', where: { status: 'default' } }, as: 'product' },
   });
 
   res.status(200).json({ body: cartItems });
