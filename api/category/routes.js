@@ -15,6 +15,7 @@ routes.get('/categories', isAuth, controller.getAllForAdmin);
 routes.get('/categories/creates', isAuth, (req, res) => res.render('createCategory.ejs'));
 routes.get('/categories/:id', isAuth, controller.getOneCategoryForAdmin);
 routes.get('/api/v1/categories/:id', validator.params(idParams), controller.getOne);
+routes.post('/api/v1/categories/:id/thumbnails', isAuth, validator.params(idParams), controller.updateThumbnail);
 routes.post('/api/v1/categories', isAuth, upload.single('file'), validator.body(createCategory), controller.createOne);
 routes.post('/api/v1/categories/:id/update', isAuth, upload.single('file'), validator.body(updateCategory), controller.updateOne);
 routes.post('/api/v1/categories/:id/delete', isAuth, validator.params(idParams), controller.deletedOne);

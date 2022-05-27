@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../connection');
 const Category = require('./Categories');
 
-const CategoryImages = sequelize.define('product_images', {
+const CategoryImages = sequelize.define('category_images', {
   id: {
     type: DataTypes.INTEGER(6).UNSIGNED,
     primaryKey: true,

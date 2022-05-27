@@ -2,6 +2,7 @@
 const moment = require('moment');
 const sequelize = require('../../connection');
 const Category = require('../../models/Categories');
+const CategoryImages = require('../../models/CategoryImages');
 const Product = require('../../models/Products');
 const { cloudinary } = require('../../services/Cloudinary');
 
@@ -22,13 +23,15 @@ module.exports.getAllForAdmin = async (req, res) => {
       ['name', 'ASC'],
       ['productQuantity', 'DESC'],
     ],
-    where: sequelize.literal('categories.deletedAt IS NULL'),
+    include: [{ model: CategoryImages, as: 'images' }, { model: Product }],
+    // where: sequelize.literal('categories.deletedAt IS NULL'),
   });
+
   res.render('category.ejs', { categories });
 };
 
 module.exports.getOneCategoryForAdmin = async (req, res) => {
-  const category = await Category.findByPk(req.params.id, { include: { model: Product, as: 'products' } });
+  const category = await Category.findByPk(req.params.id, { include: [{ model: Product, as: 'products' }, { model: CategoryImages, as: 'images' }] });
   if (!category) {
     return res.status(400).send({ message: 'Category does not exist' });
   }
@@ -64,7 +67,7 @@ module.exports.updateOne = async (req, res) => {
     req.body.thumbnail = response.url;
   }
 
-  const category = await Category.findByPk(id);
+  const category = await Category.findByPk(id, { include: { model: CategoryImages, as: 'images' } });
   if (!category) {
     return res.status(400).send({ message: 'Product does not exist' });
   }
@@ -72,6 +75,15 @@ module.exports.updateOne = async (req, res) => {
   category.update(req.body);
 
   res.render('categoryDetail.ejs', { category });
+};
+
+module.exports.updateThumbnail = async (req, res) => {
+  const { image } = req.body;
+  const { id } = req.params;
+  await CategoryImages.update({ status: 'optional' }, { where: { categoryID: id } });
+  await CategoryImages.update({ status: 'default' }, { where: { id: image } });
+
+  res.redirect(`/categories/${id}`);
 };
 
 module.exports.deletedOne = async (req, res) => {
