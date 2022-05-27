@@ -23,15 +23,23 @@ module.exports.getAllForAdmin = async (req, res) => {
       ['name', 'ASC'],
       ['productQuantity', 'DESC'],
     ],
-    include: [{ model: CategoryImages, as: 'images' }, { model: Product }],
-    // where: sequelize.literal('categories.deletedAt IS NULL'),
+    include: [
+      { model: CategoryImages, as: 'images' },
+      { model: Product },
+    ],
+    where: sequelize.literal('categories.deletedAt IS NULL'),
   });
 
   res.render('category.ejs', { categories });
 };
 
 module.exports.getOneCategoryForAdmin = async (req, res) => {
-  const category = await Category.findByPk(req.params.id, { include: [{ model: Product, as: 'products' }, { model: CategoryImages, as: 'images' }] });
+  const category = await Category.findByPk(req.params.id, {
+    include: [
+      { model: Product, as: 'products', where: { deletedAt: null } },
+      { model: CategoryImages, as: 'images' },
+    ],
+  });
   if (!category) {
     return res.status(400).send({ message: 'Category does not exist' });
   }

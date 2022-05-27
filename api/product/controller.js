@@ -1,11 +1,11 @@
 /* eslint-disable eqeqeq */
 /* eslint-disable consistent-return */
-const moment = require('moment');
 const sequelize = require('../../connection');
 const Category = require('../../models/Categories');
 const ProductCategories = require('../../models/ProductCategories');
 const ProductImages = require('../../models/ProductImages');
 const Product = require('../../models/Products');
+const OrderItem = require('../../models/OrderItem');
 const { cloudinary } = require('../../services/Cloudinary');
 
 module.exports.getAll = async (req, res) => {
@@ -153,12 +153,18 @@ module.exports.updateOne = async (req, res) => {
 module.exports.deletedOne = async (req, res) => {
   const { id } = req.params;
 
-  const product = await Product.findByPk(id);
+  const product = await Product.findByPk(id, { include: { model: OrderItem, as: 'order_items' } });
   if (!product) {
     return res.status(400).send({ message: 'Product does not exist' });
   }
 
-  product.update({ deletedAt: moment() });
+  if (product.order_items.length > 0) {
+    return res.status(400).send({ message: 'Can not delete this product' });
+  }
+
+  await ProductImages.destroy({ where: { productID: product.id } });
+  await ProductCategories.destroy({ where: { productID: product.id } });
+  await product.destroy();
 
   res.redirect('/products');
 };

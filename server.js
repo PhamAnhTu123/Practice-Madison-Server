@@ -40,6 +40,7 @@ require('./connection');
 
 Product.belongsToMany(Category, { through: ProductCategories });
 Product.hasMany(ProductImages, { as: 'images', foreignKey: 'productID' });
+Product.hasMany(OrderItem, { as: 'order_items', foreignKey: 'productID' });
 Order.hasMany(OrderItem, { as: 'items', foreignKey: 'orderID' });
 User.hasMany(Cart, { as: 'cart', foreignKey: 'userID' });
 Cart.belongsTo(User);

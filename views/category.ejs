@@ -78,7 +78,7 @@
                           <td><img style="height:50px ; width: 50px;" src="<%= category.images.length > 0 ?  category.images.find(image => image.status === 'default').url : 'https://static.thenounproject.com/png/2864213-200.png' %>" /></td>
                           <td><%= category.name %></td>
                           <td><%= category.description %></td>
-                          <td><%= category.productQuantity %></td>
+                          <td><%= category.products.length %></td>
                           <td><button class="btn-primary mb-2"><a style="color: inherit;" href="/categories/<%= category.id %>">Detail</a></button> | <form action="/api/v1/categories/<%= category.id %>/delete" method="post"><Button type="submit" class="btn-danger">delete</Button></form></td>
                         </tr>
                      <% } %>
