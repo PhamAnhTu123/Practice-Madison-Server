@@ -43,16 +43,20 @@ module.exports.getAll = async (req, res) => {
 };
 
 module.exports.getAllForAdmin = async (req, res) => {
-  const products = await Product.findAll({
+  const limit = 5;
+  const products = await Product.findAndCountAll({
     order: [
       ['name', 'ASC'],
       ['price', 'DESC'],
     ],
     include: [{ model: Category }, { model: ProductImages, as: 'images' }],
     where: sequelize.literal('products.deletedAt IS NULL'),
+    offset: limit * (req.query.pages ? req.query.pages - 1 : 0),
+    limit,
+    distinct: true,
   });
 
-  res.render('product.ejs', { products });
+  res.render('product.ejs', { products: products.rows, pages: products.count });
 };
 
 module.exports.createProduct = async (req, res) => {
