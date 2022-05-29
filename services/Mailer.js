@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+require('dotenv').config();
 
 class Mailer {
   constructor() {
@@ -12,8 +13,8 @@ class Mailer {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  message = (from, to, subject, html) => ({
-    from,
+  message = (to, subject, html) => ({
+    from: process.env.MAIL_USER,
     to,
     subject,
     html,

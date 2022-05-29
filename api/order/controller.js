@@ -123,11 +123,11 @@ module.exports.submitOrder = async (req, res) => {
 
   if (type === 'cash') {
     await order.update({ status: paymentStatus.pendingPayment });
-    const mail = mailer.message('phamanhtu12112000@gmail.com', user.email, 'Wellcome home babe', SUCCESS.YOUR_ORDER_HAS_BEEN_DELIVERING);
+    const mail = mailer.message(user.email, 'Wellcome home babe', SUCCESS.YOUR_ORDER_HAS_BEEN_DELIVERING);
     mailer.sendMail(mail);
   } else {
     await order.update({ status: paymentStatus.paymentSuccess });
-    const mail = mailer.message('phamanhtu12112000@gmail.com', user.email, 'Wellcome home babe', SUCCESS.YOUR_ORDER_HAS_BEEN_DELIVERING);
+    const mail = mailer.message(user.email, 'Wellcome home babe', SUCCESS.YOUR_ORDER_HAS_BEEN_DELIVERING);
     mailer.sendMail(mail);
   }
 

@@ -15,7 +15,7 @@ const noticeCron = cron.schedule('*/2 * * * *', async () => {
       cart.forEach((item) => {
         message += `${item.product.name} - quantity: ${item.quantity}\n`;
       });
-      const mail = mailer.message('phamanhtu12112000@gmail.com', user.email, 'Reminder', message);
+      const mail = mailer.message(user.email, 'Reminder', message);
       mailer.sendMail(mail);
     }
     return user;

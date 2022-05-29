@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable consistent-return */
 const moment = require('moment');
+const fs = require('fs');
 const User = require('../../models/Users');
 const sequelize = require('../../connection');
 const BcryptUtils = require('../../services/Bcrypt');
@@ -104,7 +105,7 @@ module.exports.register = async (req, res) => {
 
   await User.update({ verify: code, verifyExpire: moment().add(3, 'minutes') }, { where: { email } });
 
-  const mail = mailer.message('phamanhtu12112000@gmail.com', user.email, 'Wellcome home babe', `Your verify code here ${code}`);
+  const mail = mailer.message(user.email, 'Wellcome home babe', `Your verify code here ${code}`);
   mailer.sendMail(mail);
 
   res.status(200).json({ body: user });
@@ -204,7 +205,7 @@ module.exports.resendVerify = async (req, res) => {
 
   await User.update({ verify: code, verifyExpire: moment().add(3, 'minutes') }, { where: { email } });
 
-  const mail = mailer.message('phamanhtu12112000@gmail.com', user.email, 'Wellcome home babe', `Your verify code here ${code}`);
+  const mail = mailer.message(user.email, 'Wellcome home babe', `Your verify code here ${code}`);
   mailer.sendMail(mail);
 
   res.status(200).json({ message: SUCCESS.SUCCESS });
@@ -242,7 +243,6 @@ module.exports.forgotPassword = async (req, res) => {
   }
 
   const mail = mailer.message(
-    'phamanhtu12112000@gmail.com',
     user.email,
 
     'Your recover code here',
@@ -356,6 +356,7 @@ module.exports.updateMe = async (req, res) => {
       `public/${req.file.originalname}`,
       { folder: 'upload', upload_preset: 'ml_default' },
     );
+    fs.unlinkSync(`public/${req.file.originalname}`);
     req.body.avatar = response.url;
   }
 
