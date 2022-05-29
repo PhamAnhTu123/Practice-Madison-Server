@@ -95,15 +95,11 @@
                             <input disabled type="text" value="<%= order.paycheck %>" class="form-control"
                                 id="exampleInputPassword1">
                         </div>
-                        <div class="mb-3">
-                            <label for="exampleInputPassword1" class="form-label">Change payment method</label>
-                            <select class="form-select" name="paymentMethod" aria-label="Default select example">
-                                <option selected>Choose payment method</option>
-                                <option value="cash" >Cash</option>
-                                <option value="visa" >Visa</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Update</button>
+                        <% if(order.status === 'pending'){ %>
+                            <button type="submit" class="btn btn-primary">Confirm order</button>
+                          <% } else{ %>  
+                            <h6>Hello Word</h6>
+                         <% } %>
                     </form>
                 </div>
                 <div class="col-6">
@@ -111,11 +107,11 @@
                     <div class="row">
                         <% for(item of order.items) { %>
                             <div class="card me-2" style="width: 18rem;">
-                                <img src="<%= item.product.thumbnail %>" class="card-img-top" alt="...">
+                                <img src="<%= item.product.images[0].url %>" class="card-img-top" alt="...">
                                 <div class="card-body">
                                     <h5 class="card-title text-center"><%= item.product.name %></h5>
                                     <p class="card-text text-center"><b>Quantity:</b>  <%= item.quantity %></p>
-                                    <p class="card-text text-center"><b>Unit price:</b>  <%= item.product.price %>$</p>
+                                    <p class="card-text text-center"><b>Unit price:</b>  <%= item.price %>$</p>
                                 </div>
                             </div>
                          <% } %>

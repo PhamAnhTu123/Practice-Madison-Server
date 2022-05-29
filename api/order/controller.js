@@ -131,22 +131,32 @@ module.exports.submitOrder = async (req, res) => {
 module.exports.getOne = async (req, res) => {
   const { id } = req.params;
 
-  const order = await Order.findByPk(id, { include: [{ model: User, as: 'user' }, { model: OrderItem, include: { model: Product, as: 'product' }, as: 'items' }] });
+  const order = await Order.findByPk(id, {
+    include: [{ model: User, as: 'user' },
+      {
+        model: OrderItem,
+        include: {
+          model: Product,
+          include: { model: ProductImages, as: 'images', where: { status: 'default' } },
+          as: 'product',
+        },
+        as: 'items',
+      }],
+  });
 
   res.render('orderDetail.ejs', { order });
 };
 
 module.exports.updatePaymentMethod = async (req, res) => {
-  const { paymentMethod } = req.body;
   const { id } = req.params;
 
   const order = await Order.findByPk(id);
 
-  if (paymentMethod === 'visa') {
-    order.update({ paymentDate: order.createdAt, status: 'payment success', paymentMethod });
-  } else {
-    order.update({ paymentDate: moment(), status: 'payment success', paymentMethod });
+  if (order.status !== 'pending') {
+    res.status(400).send({ message: 'Order has been payed' });
   }
+
+  order.update({ paymentDate: moment(), status: 'payment success' });
 
   res.redirect(`/orders/${id}`);
 };
