@@ -5,18 +5,20 @@ const { tokenExtract } = require('../../services/TokenExtract');
 const Cart = require('../../models/Cart');
 const Product = require('../../models/Products');
 const ProductImages = require('../../models/ProductImages');
+const ERROR = require('../../constants/errors');
+const { mediaStatus } = require('../../constants/comon');
 
 module.exports.getCart = async (req, res) => {
   const tokenDecoded = tokenExtract(req);
 
   const user = await User.findByPk(tokenDecoded.id);
   if (!user) {
-    return res.status(400).send({ message: 'User does not exist' });
+    return res.status(400).send({ message: ERROR.USER_DOES_NOT_EXIST });
   }
 
   const cartItems = await Cart.findAll({
     where: { userID: tokenDecoded.id },
-    include: { model: Product, include: { model: ProductImages, as: 'images', where: { status: 'default' } }, as: 'product' },
+    include: { model: Product, include: { model: ProductImages, as: 'images', where: { status: mediaStatus.default } }, as: 'product' },
   });
 
   res.status(200).json({ body: cartItems });
@@ -28,13 +30,13 @@ module.exports.addToCart = async (req, res) => {
 
   const user = await User.findByPk(tokenDecoded.id);
   if (!user) {
-    return res.status(400).send({ message: 'User does not exist' });
+    return res.status(400).send({ message: ERROR.USER_DOES_NOT_EXIST });
   }
 
   const product = await Product.findByPk(productID);
 
   if (quantity > product.storage) {
-    return res.status(400).send({ message: 'Out of storage limit' });
+    return res.status(400).send({ message: ERROR.OUT_OF_STORAGE });
   }
 
   const cartItem = await Cart.findOne({ where: { userID: tokenDecoded.id, productID } });
@@ -55,19 +57,19 @@ module.exports.updateCart = async (req, res) => {
 
   const user = await User.findByPk(tokenDecoded.id);
   if (!user) {
-    return res.status(400).send({ message: 'User does not exist' });
+    return res.status(400).send({ message: ERROR.USER_DOES_NOT_EXIST });
   }
 
   const product = await Product.findByPk(productID);
 
   if (quantity > product.storage) {
-    return res.status(400).send({ message: 'Out of storage limit' });
+    return res.status(400).send({ message: ERROR.OUT_OF_STORAGE });
   }
 
   const cart = await Cart.findOne({ where: { userID: tokenDecoded.id, productID } });
 
   if (!cart) {
-    return res.status(400).send({ message: 'Cart item does not exist' });
+    return res.status(400).send({ message: ERROR.CART_ITEM_DOES_NOT_EXIST });
   }
 
   if (quantity === 0) {

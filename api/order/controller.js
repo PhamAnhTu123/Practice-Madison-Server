@@ -14,6 +14,12 @@ const { tokenExtract } = require('../../services/TokenExtract');
 const User = require('../../models/Users');
 const Cart = require('../../models/Cart');
 const ProductImages = require('../../models/ProductImages');
+const {
+  mediaStatus, sort, paymentMethod, paymentStatus,
+} = require('../../constants/comon');
+const ERROR = require('../../constants/errors');
+const SUCCESS = require('../../constants/success');
+const { ORDER_DOES_NOT_EXIST } = require('../../constants/errors');
 
 module.exports.getAll = async (req, res) => {
   const orders = await Order.findAll({ include: [{ model: User, as: 'user' }, { model: OrderItem, as: 'items' }] });
@@ -29,24 +35,24 @@ module.exports.getAllUserOrder = async (req, res) => {
     where: { userID: tokenDecoded.id },
     include: {
       model: OrderItem,
-      include: { model: Product, include: { model: ProductImages, as: 'images', where: { status: 'default' } }, as: 'product' },
+      include: { model: Product, include: { model: ProductImages, as: 'images', where: { status: mediaStatus.default } }, as: 'product' },
       as: 'items',
     },
   });
 
-  if (order === 'price') {
+  if (order === sort.price) {
     orders = await Order.findAll({
       where: { userID: tokenDecoded.id },
       order: [['paycheck', 'DESC']],
       include: {
         model: OrderItem,
-        include: { model: Product, include: { model: ProductImages, as: 'images', where: { status: 'default' } }, as: 'product' },
+        include: { model: Product, include: { model: ProductImages, as: 'images', where: { status: mediaStatus.default } }, as: 'product' },
         as: 'items',
       },
     });
   }
 
-  if (order === 'date') {
+  if (order === sort.date) {
     orders = await Order.findAll({
       where: { userID: tokenDecoded.id },
       order: [['createdAt', 'DESC']],
@@ -69,7 +75,7 @@ module.exports.createOrder = async (req, res) => {
     userID: tokenDecoded.id, createdAt: moment(), paymentMethod: payment,
   });
 
-  if (payment === 'visa') {
+  if (payment === paymentMethod.visa) {
     await order.update({ paymentDate: moment(), status: 'payment success' });
   }
 
@@ -78,12 +84,12 @@ module.exports.createOrder = async (req, res) => {
   for (const item of items) {
     const product = await Product.findByPk(item.productID);
     if (!product) {
-      return res.status(400).send({ message: 'Product doesnt exist' });
+      return res.status(400).send({ message: ERROR.PRODUCT_DOES_NOT_EXIST });
     }
 
     if (item.quantity > product.storage) {
       await order.destroy();
-      return res.status(400).send({ message: 'Out of storage limit' });
+      return res.status(400).send({ message: ERROR.OUT_OF_STORAGE });
     }
 
     paycheck += product.price * item.quantity;
@@ -110,18 +116,18 @@ module.exports.submitOrder = async (req, res) => {
   const order = await Order.findOne({ where: { id, userID: tokenDecoded.id }, include: { model: OrderItem, as: 'items' } });
 
   if (!order) {
-    return res(400).send({ message: 'Order does not exit' });
+    return res(400).send({ message: ERROR.ORDER_DOES_NOT_EXIST });
   }
 
   const user = await User.findByPk(tokenDecoded.id);
 
   if (type === 'cash') {
-    await order.update({ status: 'pending payment' });
-    const mail = mailer.message('phamanhtu12112000@gmail.com', user.email, 'Wellcome home babe', 'Your order has been delivering');
+    await order.update({ status: paymentStatus.pendingPayment });
+    const mail = mailer.message('phamanhtu12112000@gmail.com', user.email, 'Wellcome home babe', SUCCESS.YOUR_ORDER_HAS_BEEN_DELIVERING);
     mailer.sendMail(mail);
   } else {
-    await order.update({ status: 'payment success' });
-    const mail = mailer.message('phamanhtu12112000@gmail.com', user.email, 'Wellcome home babe', 'Your order has been delivering');
+    await order.update({ status: paymentStatus.paymentSuccess });
+    const mail = mailer.message('phamanhtu12112000@gmail.com', user.email, 'Wellcome home babe', SUCCESS.YOUR_ORDER_HAS_BEEN_DELIVERING);
     mailer.sendMail(mail);
   }
 
@@ -137,7 +143,7 @@ module.exports.getOne = async (req, res) => {
         model: OrderItem,
         include: {
           model: Product,
-          include: { model: ProductImages, as: 'images', where: { status: 'default' } },
+          include: { model: ProductImages, as: 'images', where: { status: mediaStatus.default } },
           as: 'product',
         },
         as: 'items',
@@ -152,11 +158,11 @@ module.exports.updatePaymentMethod = async (req, res) => {
 
   const order = await Order.findByPk(id);
 
-  if (order.status !== 'pending') {
-    res.status(400).send({ message: 'Order has been payed' });
+  if (order.status !== paymentStatus.pendingPayment) {
+    res.status(400).send({ message: ERROR.ORDER_HAS_BEEN_PAYED });
   }
 
-  order.update({ paymentDate: moment(), status: 'payment success' });
+  order.update({ paymentDate: moment(), status: paymentStatus.paymentSuccess });
 
   res.redirect(`/orders/${id}`);
 };
@@ -171,7 +177,7 @@ module.exports.editOrder = async (req, res) => {
   const order = await Order.findOne({ where: { id, userID: tokenDecoded.id }, include: { model: OrderItem, as: 'items' } });
 
   if (!order) {
-    return res(400).send({ message: 'Order does not exit' });
+    return res(400).send({ message: ORDER_DOES_NOT_EXIST });
   }
 
   const orderItems = order.items;

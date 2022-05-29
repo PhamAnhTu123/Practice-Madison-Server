@@ -8,6 +8,8 @@ const ProductImages = require('../../models/ProductImages');
 const Product = require('../../models/Products');
 const OrderItem = require('../../models/OrderItem');
 const { cloudinary } = require('../../services/Cloudinary');
+const ERROR = require('../../constants/errors');
+const { mediaStatus } = require('../../constants/comon');
 
 module.exports.getAll = async (req, res) => {
   let products;
@@ -81,7 +83,7 @@ module.exports.createProduct = async (req, res) => {
 module.exports.getOneForAdmin = async (req, res) => {
   const product = await Product.findByPk(req.params.id, { include: [{ model: Category }, { model: ProductImages, as: 'images' }] });
   if (!product) {
-    return res.status(400).send({ message: 'Product does not exist' });
+    return res.status(400).send({ message: ERROR.PRODUCT_DOES_NOT_EXIST });
   }
 
   res.render('productDetail.ejs', { product });
@@ -90,7 +92,7 @@ module.exports.getOneForAdmin = async (req, res) => {
 module.exports.getOne = async (req, res) => {
   const product = await Product.findByPk(req.params.id, { include: { model: Category, as: 'category' } });
   if (!product) {
-    return res.status(400).send({ message: 'Product does not exist' });
+    return res.status(400).send({ message: ERROR.PRODUCT_DOES_NOT_EXIST });
   }
 
   res.status(200).json({ body: product });
@@ -118,13 +120,13 @@ module.exports.createOne = async (req, res) => {
       await ProductImages.create({
         productID: product.id,
         url: response.url,
-        status: 'default',
+        status: mediaStatus.default,
       });
     } else {
       await ProductImages.create({
         productID: product.id,
         url: response.url,
-        status: 'optional',
+        status: mediaStatus.optional,
       });
     }
   });
@@ -158,7 +160,7 @@ module.exports.updateOne = async (req, res) => {
 
   const product = await Product.findByPk(id);
   if (!product) {
-    return res.status(400).send({ message: 'Product does not exist' });
+    return res.status(400).send({ message: ERROR.PRODUCT_DOES_NOT_EXIST });
   }
 
   if (req.file) {
@@ -176,11 +178,11 @@ module.exports.deletedOne = async (req, res) => {
 
   const product = await Product.findByPk(id, { include: { model: OrderItem, as: 'order_items' } });
   if (!product) {
-    return res.status(400).send({ message: 'Product does not exist' });
+    return res.status(400).send({ message: ERROR.PRODUCT_DOES_NOT_EXIST });
   }
 
   if (product.order_items.length > 0) {
-    return res.status(400).send({ message: 'Can not delete this product' });
+    return res.status(400).send({ message: ERROR.CAN_NOT_DELETE_THIS_PRODUCT });
   }
 
   await ProductImages.destroy({ where: { productID: product.id } });

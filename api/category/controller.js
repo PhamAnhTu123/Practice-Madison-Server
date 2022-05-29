@@ -1,6 +1,8 @@
 /* eslint-disable consistent-return */
 const fs = require('fs');
 const sequelize = require('../../connection');
+const { mediaStatus } = require('../../constants/comon');
+const ERROR = require('../../constants/errors');
 const Category = require('../../models/Categories');
 const CategoryImages = require('../../models/CategoryImages');
 const Product = require('../../models/Products');
@@ -45,7 +47,7 @@ module.exports.getOneCategoryForAdmin = async (req, res) => {
     ],
   });
   if (!category) {
-    return res.status(400).send({ message: 'Category does not exist' });
+    return res.status(400).send({ message: ERROR.CATEGORIES_DOES_NOT_EXIST });
   }
 
   res.render('categoryDetail.ejs', { category });
@@ -54,7 +56,7 @@ module.exports.getOneCategoryForAdmin = async (req, res) => {
 module.exports.getOne = async (req, res) => {
   const category = await Category.findByPk(req.params.id, { include: { model: Product, as: 'products' } });
   if (!category) {
-    return res.status(400).send({ message: 'Category does not exist' });
+    return res.status(400).send({ message: ERROR.CATEGORIES_DOES_NOT_EXIST });
   }
 
   res.status(200).json({ body: category });
@@ -75,13 +77,13 @@ module.exports.createOne = async (req, res) => {
       await CategoryImages.create({
         categoryID: category.id,
         url: response.url,
-        status: 'default',
+        status: mediaStatus.default,
       });
     } else {
       await CategoryImages.create({
         categoryID: category.id,
         url: response.url,
-        status: 'optional',
+        status: mediaStatus.optional,
       });
     }
   });
@@ -99,7 +101,7 @@ module.exports.updateOne = async (req, res) => {
 
   const category = await Category.findByPk(id, { include: { model: CategoryImages, as: 'images' } });
   if (!category) {
-    return res.status(400).send({ message: 'Product does not exist' });
+    return res.status(400).send({ message: ERROR.CATEGORIES_DOES_NOT_EXIST });
   }
 
   category.update(req.body);
@@ -110,8 +112,8 @@ module.exports.updateOne = async (req, res) => {
 module.exports.updateThumbnail = async (req, res) => {
   const { image } = req.body;
   const { id } = req.params;
-  await CategoryImages.update({ status: 'optional' }, { where: { categoryID: id } });
-  await CategoryImages.update({ status: 'default' }, { where: { id: image } });
+  await CategoryImages.update({ status: mediaStatus.optional }, { where: { categoryID: id } });
+  await CategoryImages.update({ status: mediaStatus.default }, { where: { id: image } });
 
   res.redirect(`/categories/${id}`);
 };
@@ -121,11 +123,11 @@ module.exports.deletedOne = async (req, res) => {
 
   const category = await Category.findByPk(id, { include: { model: Product } });
   if (!category) {
-    return res.status(400).send({ message: 'Category does not exist' });
+    return res.status(400).send({ message: ERROR.CATEGORIES_DOES_NOT_EXIST });
   }
 
   if (category.products.length > 0) {
-    return res.status(400).send({ message: 'Can not delete this category' });
+    return res.status(400).send({ message: ERROR.CAN_NOT_DELETE_THIS_CATEGORY });
   }
 
   await CategoryImages.destroy({ where: { categoryID: category.id } });
