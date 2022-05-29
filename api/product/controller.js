@@ -11,9 +11,13 @@ const { cloudinary } = require('../../services/Cloudinary');
 
 module.exports.getAll = async (req, res) => {
   let products;
-  products = await Product.findAll({
+  const limit = 5;
+  products = await Product.findAndCountAll({
     include: [{ model: Category, as: 'categories' }, { model: ProductImages, as: 'images', where: { status: 'default' } }],
     where: sequelize.literal('products.deletedAt IS NULL'),
+    offset: limit * (req.query.pages ? req.query.pages - 1 : 0),
+    limit,
+    distinct: true,
   });
   if (req.query.order) {
     if (req.query.order === 'name') {
@@ -23,6 +27,9 @@ module.exports.getAll = async (req, res) => {
         ],
         include: [{ model: Category, as: 'categories' }, { model: ProductImages, as: 'images', where: { status: 'default' } }],
         where: sequelize.literal('products.deletedAt IS NULL'),
+        offset: limit * (req.query.pages ? req.query.pages - 1 : 0),
+        limit,
+        distinct: true,
       });
     } else {
       products = await Product.findAll({
@@ -31,12 +38,19 @@ module.exports.getAll = async (req, res) => {
         ],
         include: [{ model: Category, as: 'categories' }, { model: ProductImages, as: 'images', where: { status: 'default' } }],
         where: sequelize.literal('products.deletedAt IS NULL'),
+        offset: limit * (req.query.pages ? req.query.pages - 1 : 0),
+        limit,
+        distinct: true,
       });
     }
   }
   if (req.query.category) {
     // eslint-disable-next-line max-len
-    const filteredProducts = products.filter((product) => product.categories.some((category) => category.id == req.query.category));
+    const filteredProducts = {
+      // eslint-disable-next-line max-len
+      rows: products.rows.filter((product) => product.categories.some((category) => category.id == req.query.category)),
+      count: products.count,
+    };
     return res.status(200).json({ body: filteredProducts });
   }
   res.status(200).json({ body: products });
