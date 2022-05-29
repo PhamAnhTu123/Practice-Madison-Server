@@ -11,6 +11,7 @@ const { cloudinary } = require('../../services/Cloudinary');
 const { tokenExtract } = require('../../services/TokenExtract');
 const Cart = require('../../models/Cart');
 const Product = require('../../models/Products');
+const AuthToken = require('../../models/AuthToken');
 
 const bcrypt = new BcryptUtils();
 const jwt = new Jwt();
@@ -211,14 +212,73 @@ module.exports.forgotPassword = async (req, res) => {
     return res.status(400).send({ message: 'User does not exist' });
   }
 
-  const code = generateRandStr(6, 'mix');
+  const token = jwt.issue({
+    email: user.email,
+    expire: moment().add(3, 'minutes'),
+  });
 
-  await User.update({ passCode: code, passCodeExpire: moment().add(3, 'minutes') }, { where: { email } });
+  const authTokens = await AuthToken.findAll({ where: { email } });
 
-  const mail = mailer.message('phamanhtu12112000@gmail.com', user.email, 'Your recover code here', `Your verify code here ${code}`);
+  if (authTokens.length > 0) {
+    await AuthToken.update({ status: 'disable' }, { where: { email } });
+    await AuthToken.create({
+      email,
+      token,
+      status: 'available',
+    });
+  } else {
+    await AuthToken.create({
+      email,
+      token,
+      status: 'available',
+    });
+  }
+
+  const mail = mailer.message(
+    'phamanhtu12112000@gmail.com',
+    user.email,
+
+    'Your recover code here',
+
+    `Your reset password link here http://localhost:8080/auth/${token}`,
+  );
   mailer.sendMail(mail);
 
   res.status(200).json({ message: 'Success' });
+};
+
+module.exports.authTokenTemplate = async (req, res) => {
+  const { token } = req.params;
+  const auth = await AuthToken.findOne({ where: { token } });
+  if (auth.status === 'disable') {
+    return res.status(400).send('Lol, Cannot use this link anymore');
+  }
+
+  const currentToken = jwt.verify(token);
+  if (moment() > moment(currentToken.expire)) {
+    return res.status(400).send('Lol, Cannot use this link anymore');
+  }
+
+  res.render('AuthToken.ejs', { email: currentToken.email, token });
+};
+
+module.exports.verifyAuthToken = async (req, res) => {
+  const { password } = req.body;
+  const { token } = req.params;
+  const auth = await AuthToken.findOne({ where: { token } });
+  if (auth.status === 'disable') {
+    return res.status(400).send('Lol, Cannot use this link anymore');
+  }
+
+  const currentToken = jwt.verify(token);
+  if (moment() > moment(currentToken.expire)) {
+    return res.status(400).send('Lol, Cannot use this link anymore');
+  }
+
+  const newPassword = await bcrypt.hash(password);
+  await User.update({ password: newPassword }, { where: { email: currentToken.email } });
+  await AuthToken.update({ status: 'disable' }, { where: { token } });
+  res.status(200).send('Change password success, now try to login again');
 };
 
 module.exports.resetPassword = async (req, res) => {

@@ -6,6 +6,7 @@ const sequelize = new Sequelize('trainning', 'root', '123456', {
   define: {
     timestamps: false,
   },
+  logging: false,
 });
 
 module.exports = sequelize;

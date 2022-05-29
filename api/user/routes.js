@@ -20,6 +20,8 @@ const { isAuth } = require('../../middlewares/isAuth');
 const routes = express.Router();
 
 routes.get('/wellcome', controller.wellcome);
+routes.get('/auth/:token', controller.authTokenTemplate);
+routes.post('/auth/:token', controller.verifyAuthToken);
 routes.get('/dashboard', isAuth, controller.dashboard);
 routes.get('/admin/login', controller.loginTemplate);
 routes.post('/api/v1/test', upload.single('file'), controller.testMultiplepart);
