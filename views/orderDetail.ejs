@@ -95,7 +95,7 @@
                             <input disabled type="text" value="<%= order.paycheck %>" class="form-control"
                                 id="exampleInputPassword1">
                         </div>
-                        <% if(order.status === 'pending'){ %>
+                        <% if(order.status === 'pending payment'){ %>
                             <button type="submit" class="btn btn-primary">Confirm order</button>
                           <% } else{ %>  
                             <h6>Hello Word</h6>
