@@ -76,7 +76,7 @@ module.exports.createOrder = async (req, res) => {
   });
 
   if (payment === paymentMethod.visa) {
-    await order.update({ paymentDate: moment(), status: 'payment success' });
+    await order.update({ paymentDate: moment(), status: paymentStatus.paymentSuccess });
   }
 
   let paycheck = 0;
@@ -121,7 +121,7 @@ module.exports.submitOrder = async (req, res) => {
 
   const user = await User.findByPk(tokenDecoded.id);
 
-  if (type === 'cash') {
+  if (type === paymentMethod.cash) {
     await order.update({ status: paymentStatus.pendingPayment });
     const mail = mailer.message(user.email, 'Wellcome home babe', SUCCESS.YOUR_ORDER_HAS_BEEN_DELIVERING);
     mailer.sendMail(mail);
