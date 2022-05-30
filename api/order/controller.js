@@ -22,9 +22,18 @@ const SUCCESS = require('../../constants/success');
 const { ORDER_DOES_NOT_EXIST } = require('../../constants/errors');
 
 module.exports.getAll = async (req, res) => {
-  const orders = await Order.findAll({ include: [{ model: User, as: 'user' }, { model: OrderItem, as: 'items' }] });
+  const limit = 5;
+  const orders = await Order.findAndCountAll({
+    attributes: ['createdAt', 'paymentMethod', 'paycheck', 'status'],
+    include: [
+      { model: User, as: 'user' }, { model: OrderItem, as: 'items' },
+    ],
+    offset: limit * (req.query.pages ? req.query.pages - 1 : 0),
+    limit,
+    distinct: true,
+  });
 
-  res.render('order.ejs', { orders });
+  res.render('order.ejs', { orders: orders.rows, pages: orders.count });
 };
 
 module.exports.getAllUserOrder = async (req, res) => {
